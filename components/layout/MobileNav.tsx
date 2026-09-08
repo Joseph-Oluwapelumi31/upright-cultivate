@@ -9,7 +9,6 @@ const navLinks = [
   { label: "Why us", href: "#why" },
   { label: "Products", href: "#products" },
   { label: "Industries", href: "#industries" },
-  { label: "Contact", href: "#contact" },
 ];
 
 export default function MobileNav() {
@@ -81,7 +80,7 @@ export default function MobileNav() {
             aria-expanded={menuOpen}
             aria-controls="mobile-navigation"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
-            className="cursor-pointer rounded-full border border-white/30 bg-white/55 p-3 text-(--primary) shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/70"
+            className="cursor-pointer rounded-full border border-white/30 bg-white/55 p-3 text-primary shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/70"
           >
             {menuOpen ? (
               <X className="h-4 w-4" />

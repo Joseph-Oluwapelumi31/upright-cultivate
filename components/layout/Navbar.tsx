@@ -10,7 +10,6 @@ const navLinks = [
   { label: "Why us", href: "#why" },
   { label: "Products", href: "#products" },
   { label: "Industries", href: "#industries" },
-  { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
@@ -59,18 +58,19 @@ export default function Navbar() {
         <Link
           href="#"
           aria-label="Upright Cultivate home"
-          className="flex items-center gap-2.5 rounded-full border border-white/30 bg-white/55 px-4 py-2.5 text-xl font-medium text-(--primary) shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/70 max-[650px]:text-[17px]"
+          className="flex items-center gap-2.5 rounded-full border border-white/30 bg-white/55 p-4 md:px-4 md:py-2.5 text-xl font-medium text-primary shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/70 max-[650px]:text-[17px]"
         >
           <Image
-            src="/logo-icon.png"
+            src="/logo.png"
             alt=""
             width={28}
             height={28}
             priority
             className="h-8 w-8 shrink-0"
           />
-
-          Upright Cultivate
+              <span className="hidden md:block text-xl font-medium tracking-[-0.02em] text-primary">
+                Upright Cultivate
+              </span>
         </Link>
 
         {/* Desktop navigation + CTA */}
@@ -99,21 +99,7 @@ export default function Navbar() {
           </Button>
         </div>
 
-        {/* Mobile menu button */}
-        <button
-          type="button"
-          onClick={() => setMenuOpen((open) => !open)}
-          aria-expanded={menuOpen}
-          aria-controls="mobile-navigation"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          className="hidden cursor-pointer rounded-full border border-white/30 bg-white/55 p-3 text-(--primary) shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/70 max-[900px]:block"
-        >
-          {menuOpen ? (
-            <X className="h-4 w-4" />
-          ) : (
-            <Menu className="h-4 w-4" />
-          )}
-        </button>
+        
       </div>
 
       {/* Mobile navigation */}

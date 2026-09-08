@@ -23,7 +23,7 @@ export default function Footer() {
               className="inline-flex items-center gap-2.5"
             >
               <Image
-                src="/logo-icon.png"
+                src="/logo.png"
                 alt=""
                 width={28}
                 height={28}
