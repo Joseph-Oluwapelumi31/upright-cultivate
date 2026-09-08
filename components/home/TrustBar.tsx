@@ -1,7 +1,18 @@
 import Container from "@/components/ui/Container";
-import { Leaf, PackageCheck, Sprout, Truck } from "lucide-react";
+import {
+  Leaf,
+  PackageCheck,
+  Sprout,
+  Truck,
+  type LucideIcon,
+} from "lucide-react";
 
-const points = [
+interface TrustPoint {
+  label: string;
+  icon: LucideIcon;
+}
+
+const points: TrustPoint[] = [
   { label: "Locally grown", icon: Leaf },
   { label: "Demand-led growing", icon: Sprout },
   { label: "Controlled environment", icon: PackageCheck },
@@ -10,19 +21,30 @@ const points = [
 
 export default function TrustBar() {
   return (
-    <section className="border-b border-[var(--deep-moss)]/10 bg-[var(--citron-beam)] py-6">
+    <section
+      aria-label="Upright Cultivate benefits"
+      className="border-b border-(--primary)/10 bg-(--accent) py-6"
+    >
       <Container>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {points.map(({ label, icon: Icon }, index) => (
-            <div key={label} className="flex items-center gap-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--deep-moss)] text-[var(--citron-beam)]">
-                <span className="text-[10px] font-semibold">0{index + 1}</span>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {points.map(({ label, icon: Icon }) => (
+            <li
+              key={label}
+              className="group flex items-center gap-3"
+            >
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-(--primary) text-(--accent) transition-transform duration-200 group-hover:scale-105"
+                aria-hidden="true"
+              >
+                <Icon size={17} strokeWidth={2.2} />
               </span>
-              <Icon size={16} strokeWidth={2.2} className="text-[var(--deep-moss)]" />
-              <span className="text-sm font-medium text-[var(--deep-moss)]">{label}</span>
-            </div>
+
+              <span className="text-sm font-medium text-(--primary)">
+                {label}
+              </span>
+            </li>
           ))}
-        </div>
+        </ul>
       </Container>
     </section>
   );

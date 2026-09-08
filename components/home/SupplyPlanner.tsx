@@ -25,7 +25,7 @@ export default function SupplyPlanner() {
   return (
     <section
       id="supply-planner"
-      className="bg-(--deep-moss) py-24 text-(--white) sm:py-32"
+      className="bg-(--primary) py-24 text-(--primary-foreground) sm:py-32"
     >
       <Container>
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
@@ -37,8 +37,9 @@ export default function SupplyPlanner() {
 
           <form
             onSubmit={handleSubmit}
-            className="rounded-4xl bg-(--white) p-7 text-(--deep-moss) sm:p-10"
+            className="rounded-[2rem] bg-(--surface) p-7 text-(--primary) sm:p-10"
           >
+            {/* Produce */}
             <div>
               <label className="text-sm font-medium">
                 What do you need?
@@ -48,12 +49,13 @@ export default function SupplyPlanner() {
                 {produceOptions.map((produce) => (
                   <label
                     key={produce}
-                    className="flex cursor-pointer items-center gap-2 rounded-xl border border-(--deep-moss)/10 p-3 text-sm"
+                    className="flex cursor-pointer items-center gap-2 rounded-xl border border-(--primary)/10 p-3 text-sm transition-colors hover:border-(--primary)/25 hover:bg-(--background)"
                   >
                     <input
                       type="checkbox"
                       name="produce"
                       value={produce}
+                      className="accent-(--primary)"
                     />
                     {produce}
                   </label>
@@ -61,6 +63,7 @@ export default function SupplyPlanner() {
               </div>
             </div>
 
+            {/* Delivery frequency */}
             <div className="mt-8">
               <label htmlFor="frequency" className="text-sm font-medium">
                 Delivery frequency
@@ -68,7 +71,8 @@ export default function SupplyPlanner() {
 
               <select
                 id="frequency"
-                className="mt-3 w-full rounded-xl border border-(--deep-moss)/15 bg-transparent px-4 py-3 outline-none"
+                name="frequency"
+                className="mt-3 w-full rounded-xl border border-(--primary)/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors focus:border-(--primary)/40 focus:ring-2 focus:ring-(--primary)/10"
               >
                 <option>Weekly</option>
                 <option>Twice a week</option>
@@ -77,6 +81,7 @@ export default function SupplyPlanner() {
               </select>
             </div>
 
+            {/* Business type */}
             <div className="mt-8">
               <label htmlFor="business" className="text-sm font-medium">
                 Business type
@@ -84,7 +89,8 @@ export default function SupplyPlanner() {
 
               <select
                 id="business"
-                className="mt-3 w-full rounded-xl border border-(--deep-moss)/15 bg-transparent px-4 py-3 outline-none"
+                name="business"
+                className="mt-3 w-full rounded-xl border border-(--primary)/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors focus:border-(--primary)/40 focus:ring-2 focus:ring-(--primary)/10"
               >
                 <option>Restaurant</option>
                 <option>Hotel</option>
@@ -95,6 +101,7 @@ export default function SupplyPlanner() {
               </select>
             </div>
 
+            {/* Weekly volume */}
             <div className="mt-8">
               <label htmlFor="volume" className="text-sm font-medium">
                 Estimated weekly volume
@@ -102,18 +109,22 @@ export default function SupplyPlanner() {
 
               <input
                 id="volume"
+                name="volume"
                 type="text"
                 placeholder="e.g. 20kg"
-                className="mt-3 w-full rounded-xl border border-(--deep-moss)/15 bg-transparent px-4 py-3 outline-none"
+                className="mt-3 w-full rounded-xl border border-(--primary)/15 bg-transparent px-4 py-3 text-sm outline-none placeholder:text-(--foreground)/35 transition-colors focus:border-(--primary)/40 focus:ring-2 focus:ring-(--primary)/10"
               />
             </div>
 
+            {/* Submit */}
             <div className="mt-8">
-              <Button>Request supply plan →</Button>
+              <Button type="submit" variant="primary">
+                Request supply plan →
+              </Button>
             </div>
 
             {submitted && (
-              <p className="mt-5 text-sm text-(--olive)">
+              <p className="mt-5 text-sm text-(--secondary)">
                 Thanks. Your request has been captured.
               </p>
             )}

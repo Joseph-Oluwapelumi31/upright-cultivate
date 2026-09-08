@@ -45,7 +45,6 @@ export default function HowItWorks() {
 
         const nextRect = nextCard.getBoundingClientRect();
 
-        // Start fading when the next card approaches the stack
         const start = window.innerHeight * 0.72;
         const end = window.innerHeight * 0.28;
 
@@ -83,7 +82,10 @@ export default function HowItWorks() {
   }, []);
 
   return (
-    <section id="how-it-works" className="py-24 sm:py-32">
+    <section
+      id="how-it-works"
+      className="bg-(--background) py-24 sm:py-32"
+    >
       <Container>
         <SectionHeading
           eyebrow="How it works"
@@ -93,7 +95,7 @@ export default function HowItWorks() {
         <div className="mt-16 grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
           {/* Left side */}
           <div className="lg:sticky lg:top-32 lg:self-start">
-            <p className="max-w-sm text-(--forest)/70">
+            <p className="max-w-sm text-base leading-relaxed text-(--foreground)/65">
               From planning your supply to delivering fresh produce, every
               step is built around your business.
             </p>
@@ -107,21 +109,23 @@ export default function HowItWorks() {
                 ref={(el) => {
                   cardsRef.current[index] = el;
                 }}
-                className="sticky top-32 mb-6 min-h-[420px] rounded-4xl bg-(--cream) p-8 ring-1 ring-(--deep-moss)/10 will-change-transform sm:p-12"
+                className="sticky top-32 mb-6 min-h-[420px] rounded-[2rem] bg-(--surface) p-8 ring-1 ring-(--primary)/10 will-change-transform sm:p-12"
                 style={{
                   zIndex: index + 1,
                 }}
               >
-                <span className="text-sm text-(--copper)">
+                {/* Step number */}
+                <span className="text-sm font-medium tracking-[0.08em] text-(--highlight)">
                   {step.number}
                 </span>
 
+                {/* Content */}
                 <div className="mt-20 max-w-xl">
-                  <h3 className="text-2xl sm:text-4xl">
+                  <h3 className="font-(--font-display) text-2xl font-medium leading-tight tracking-[-0.03em] text-(--primary) sm:text-4xl">
                     {step.title}
                   </h3>
 
-                  <p className="mt-4 max-w-md text-sm leading-6 text-(--forest)/70 sm:text-base">
+                  <p className="mt-4 max-w-md text-sm leading-6 text-(--foreground)/65 sm:text-base">
                     {step.text}
                   </p>
                 </div>

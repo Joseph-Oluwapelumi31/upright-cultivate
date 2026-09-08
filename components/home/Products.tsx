@@ -45,14 +45,26 @@ const productGroups = [
 
 export default function Products() {
   return (
-    <section id="products" className="section-shell bg-(--white)">
+    <section
+      id="products"
+      className="bg-(--surface) px-6 py-24 sm:py-32"
+    >
       <Container>
         {/* Section heading */}
-        <div className="section-head">
-          <h2>What we grow</h2>
+        <div className="grid gap-8 md:grid-cols-[1fr_0.8fr] md:items-end">
+          <div>
+            <span className="mb-5 inline-block text-[11px] font-medium uppercase tracking-[0.16em] text-(--secondary)">
+              Our produce
+            </span>
 
-          <p>
-            A living catalog, planted around what your kitchen actually orders.
+            <h2 className="font-(--font-display) text-4xl font-medium leading-[1] tracking-[-0.05em] text-(--primary) sm:text-5xl md:text-6xl">
+              What we grow
+            </h2>
+          </div>
+
+          <p className="max-w-xl text-base leading-relaxed text-(--foreground)/65 md:text-lg">
+            A living catalog, planted around what your kitchen actually
+            orders.
           </p>
         </div>
 
@@ -61,7 +73,7 @@ export default function Products() {
           {productGroups.map(({ title, items, image, alt }, index) => (
             <article
               key={title}
-              className="group grid gap-8 border-t border-(--deep-moss)/15 py-10 md:grid-cols-2 md:items-center md:gap-16 md:py-16"
+              className="group grid gap-8 border-t border-(--primary)/15 py-10 md:grid-cols-2 md:items-center md:gap-16 md:py-16"
             >
               {/* Image */}
               <div
@@ -75,7 +87,7 @@ export default function Products() {
                   width={520}
                   height={340}
                   sizes="(min-width: 768px) 50vw, 100vw"
-                  className="h-auto w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025] group-active:scale-[1.025]"
+                  className="h-auto w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]"
                 />
               </div>
 
@@ -85,16 +97,16 @@ export default function Products() {
                   index % 2 !== 0 ? "md:order-1" : "md:order-2"
                 }
               >
-                <h3 className="max-w-lg text-3xl leading-tight tracking-[-0.02em] sm:text-4xl">
+                <h3 className="max-w-lg font-(--font-display) text-3xl font-medium leading-tight tracking-[-0.03em] text-(--primary) sm:text-4xl">
                   {title}
                 </h3>
 
-                <div className="mt-7 max-w-xl border-t border-(--deep-moss)/15 pt-5">
+                <div className="mt-7 max-w-xl border-t border-(--primary)/15 pt-5">
                   <ul className="flex flex-wrap gap-x-5 gap-y-3">
                     {items.map((item) => (
                       <li
                         key={item}
-                        className="relative text-sm text-(--forest)/75 after:absolute after:-right-3 after:top-1/2 after:h-1 after:w-1 after:-translate-y-1/2 after:rounded-full after:bg-(--copper)/60 last:after:hidden"
+                        className="relative text-sm text-(--foreground)/70 after:absolute after:-right-3 after:top-1/2 after:h-1 after:w-1 after:-translate-y-1/2 after:rounded-full after:bg-(--highlight)/60 last:after:hidden"
                       >
                         {item}
                       </li>
@@ -107,8 +119,8 @@ export default function Products() {
         </div>
 
         {/* Closing line */}
-        <div className="border-t border-(--deep-moss)/15 py-10">
-          <p className="text-sm text-(--forest)/65">
+        <div className="border-t border-(--primary)/15 py-10">
+          <p className="text-sm text-(--foreground)/60">
             From everyday staples to custom crop plans.
           </p>
         </div>

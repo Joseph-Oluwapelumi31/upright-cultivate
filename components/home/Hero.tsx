@@ -1,78 +1,86 @@
-
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowDownRight } from "lucide-react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 
 export default function Hero() {
-  const [scrollY, setScrollY] = useState(0);
+  const { scrollY } = useScroll();
+  const prefersReducedMotion = useReducedMotion();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+  const y = useTransform(scrollY, [0, 1000], [0, 250]);
 
   return (
-    <section className="relative min-h-screen overflow-hidden">
-      {/* Background image */}
-<div
-  className="absolute inset-0 scale-105 bg-cover bg-center bg-no-repeat will-change-transform"
-  style={{
-    backgroundImage: "url('/farm-hero.jpg')",
-    transform: `translateY(${scrollY * 0.25}px) scale(1.05)`,
-  }}
-  aria-hidden="true"
-/>
+    <section
+      aria-labelledby="hero-heading"
+      className="relative min-h-screen overflow-hidden bg-primary"
+    >
+      {/* Background */}
+      <motion.div
+        aria-hidden="true"
+        className="absolute inset-0 scale-105 bg-[url('/farm-hero.jpg')] bg-cover bg-center bg-no-repeat"
+        style={{
+          y: prefersReducedMotion ? 0 : y,
+        }}
+      />
 
-{/* Dark overlay */}
-<div
-  className="absolute inset-0 bg-linear-to-b from-(--deep-moss)/55 via-(--deep-moss)/45 to-(--deep-moss)/70"
-  aria-hidden="true"
-/>
-      {/* Hero content */}
-      <div className="relative z-10 flex min-h-screen flex-col justify-between px-6 py-32">
-        {/* Main content */}
-        <div className="flex flex-1 items-center justify-center">
-          <div className="max-w-3xl text-left md:text-center">
-            <span className="eyebrow-tag">
+      {/* Overlay */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-linear-to-b from-primary/55 via-primary/45 to-primary/75"
+      />
+
+      {/* Content */}
+      <div className="relative z-10 flex min-h-screen items-center px-6 py-32 md:px-10 lg:px-16">
+        <div className="mx-auto w-full max-w-350">
+          <div className="max-w-5xl">
+            {/* Eyebrow */}
+            <span className="inline-flex items-center rounded-full border border-white/25 bg-white/10 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.16em] text-white/85 backdrop-blur-sm">
               Growing better, together
             </span>
 
-            <h1 className="hero-title">
-              Upright
+            {/* Heading */}
+            <h1
+              id="hero-heading"
+              className="mt-6 max-w-4xl font-display text-5xl font-medium leading-[0.95] tracking-[-0.055em] text-white sm:text-6xl md:text-7xl lg:text-[clamp(4.5rem,8vw,8rem)]"
+            >
+              Fresh greens.
               <br />
-              Cultivate*
+              Grown for your kitchen.
             </h1>
 
-            <p className="hero-sub mx-0 max-w-xl md:mx-auto">
-              Fresh leafy greens and herbs, harvested in the city and on your
-              line within hours.
+            {/* Description */}
+            <p className="mt-8 max-w-xl text-base leading-relaxed text-white/75 md:text-lg">
+              Premium leafy greens and culinary herbs, grown locally in
+              controlled environments and harvested around your demand.
             </p>
+
+            {/* Actions */}
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <Link
+                href="#supply-planner"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-accent-foreground transition-[transform,opacity] duration-200 hover:-translate-y-0.5 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+              >
+                Request a supply plan
+                <ArrowDownRight size={16} strokeWidth={2.5} />
+              </Link>
+
+              <Link
+                href="#products"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3.5 text-sm font-medium text-white backdrop-blur-md transition-[background-color,transform] duration-200 hover:bg-white/20 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+              >
+                Explore produce
+                <ArrowDownRight size={15} strokeWidth={2.2} />
+              </Link>
+            </div>
           </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="relative flex w-full justify-start md:justify-center">
-          <Link href="#contact" className="hero-cta">
-            Request a quote
-            <ArrowDownRight size={16} strokeWidth={2.5} />
-          </Link>
-
-          {/* Scroll hint */}
-          <span className="scroll-hint absolute right-0 top-1/2 hidden -translate-y-1/2 md:block">
-            [ scroll down ]
-          </span>
         </div>
       </div>
     </section>
   );
 }
-

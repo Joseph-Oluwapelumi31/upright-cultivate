@@ -21,28 +21,46 @@ const industries = [
 
 export default function Industries() {
   return (
-    <section id="industries" className="section-shell tight">
+    <section
+      id="industries"
+      className="bg-(--background) px-6 py-20 sm:py-24 md:py-28"
+    >
       <Container>
-        <div className="section-head">
-          <h2>
+        {/* Section heading */}
+        <div className="mb-14 md:mb-16">
+          <span className="mb-5 inline-block text-[11px] font-medium uppercase tracking-[0.16em] text-(--secondary)">
+            Who we serve
+          </span>
+
+          <h2 className=" text-4xl font-medium leading-[0.95] tracking-tighter text-(--primary) sm:text-5xl md:text-6xl">
             Industries
             <br />
             we serve
           </h2>
         </div>
 
-        <div className="industry-grid">
+        {/* Industry cards */}
+        <div className="grid border-t border-(--primary)/15 md:grid-cols-3">
           {industries.map(({ title, text, icon: Icon }) => (
-            <div key={title} className="industry-card">
-              <span
-                className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-(--copper) bg-(--white) text-(--copper)"
+            <article
+              key={title}
+              className="border-b border-(--primary)/15 py-8 md:border-b-0 md:border-r md:px-8 md:py-10 first:md:pl-0 last:md:border-r-0 last:md:pr-0"
+            >
+              <div
+                className="mb-8 flex h-10 w-10 items-center justify-center rounded-full border border-(--highlight)/30 bg-(--surface) text-(--highlight)"
                 aria-hidden="true"
               >
-                <Icon size={16} strokeWidth={2.2} />
-              </span>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </div>
+                <Icon size={17} strokeWidth={2.2} />
+              </div>
+
+              <h3 className=" text-2xl font-medium tracking-[-0.03em] text-(--primary)">
+                {title}
+              </h3>
+
+              <p className="mt-3 max-w-sm text-sm leading-relaxed text-(--foreground)/65">
+                {text}
+              </p>
+            </article>
           ))}
         </div>
       </Container>

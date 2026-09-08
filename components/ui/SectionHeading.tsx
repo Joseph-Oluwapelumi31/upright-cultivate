@@ -18,17 +18,17 @@ export default function SectionHeading({
       }`}
     >
       {eyebrow && (
-        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--copper)]">
+        <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.16em] text-(--secondary)">
           {eyebrow}
         </p>
       )}
 
-      <h2 className="text-4xl font-medium leading-[0.95] tracking-tight sm:text-5xl lg:text-6xl">
+      <h2 className=" text-4xl font-medium leading-[0.95] tracking-tighter text-(--primary) sm:text-5xl lg:text-6xl">
         {title}
       </h2>
 
       {description && (
-        <p className="mt-6 max-w-2xl text-base leading-7 text-[var(--forest)]/75 sm:text-lg">
+        <p className="mt-6 max-w-2xl text-base leading-7 text-(--foreground)/65 sm:text-lg">
           {description}
         </p>
       )}

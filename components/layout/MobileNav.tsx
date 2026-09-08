@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 const navLinks = [
   { label: "Why us", href: "#why" },
@@ -20,7 +21,6 @@ export default function MobileNav() {
     let lastScrollY = window.scrollY;
 
     const handleScroll = () => {
-      // Don't hide the navbar while the mobile menu is open
       if (menuOpen) return;
 
       const currentScrollY = window.scrollY;
@@ -81,8 +81,7 @@ export default function MobileNav() {
             aria-expanded={menuOpen}
             aria-controls="mobile-navigation"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
-            className="cursor-pointer rounded-full border border-white/30 bg-white/55 p-3 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-200 hover:bg-white/70"
-            style={{ color: "var(--primary)" }}
+            className="cursor-pointer rounded-full border border-white/30 bg-white/55 p-3 text-(--primary) shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/70"
           >
             {menuOpen ? (
               <X className="h-4 w-4" />
@@ -94,7 +93,7 @@ export default function MobileNav() {
 
         {/* Mobile menu */}
         <div
-          className={`absolute left-6 right-6 top-[calc(100%+12px)] origin-top transition-all duration-300 ${
+          className={`absolute left-6 right-6 top-[calc(100%+12px)] origin-top transition-[transform,opacity] duration-300 ${
             menuOpen
               ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
               : "pointer-events-none -translate-y-2 scale-[0.98] opacity-0"
@@ -111,19 +110,20 @@ export default function MobileNav() {
                   key={link.href}
                   href={link.href}
                   onClick={closeMenu}
-                  className="rounded-2xl px-4 py-3.5 text-sm font-medium text-(--deep-moss) opacity-80 transition-all duration-200 hover:bg-white/60 hover:opacity-100"
+                  className="rounded-2xl px-4 py-3.5 text-sm font-medium text-(--primary) opacity-80 transition-colors duration-200 hover:bg-white/60 hover:opacity-100"
                 >
                   {link.label}
                 </Link>
               ))}
 
-              <Link
-                href="#contact"
+              <Button
+                href="#supply-planner"
+                variant="primary"
+                className="mt-2 w-full text-sm"
                 onClick={closeMenu}
-                className="mt-2 inline-flex min-h-[46px] items-center justify-center rounded-full bg-(--primary) px-5 py-2.5 text-sm font-medium text-(--primary-foreground) transition-transform duration-200 hover:-translate-y-0.5"
               >
                 Request supply plan
-              </Link>
+              </Button>
             </div>
           </nav>
         </div>
