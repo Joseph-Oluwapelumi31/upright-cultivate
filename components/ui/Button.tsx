@@ -6,6 +6,8 @@ interface ButtonProps {
   href?: string;
   variant?: "primary" | "secondary";
   className?: string;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
 }
 
 export default function Button({
@@ -13,11 +15,13 @@ export default function Button({
   href,
   variant = "primary",
   className = "",
+  disabled = false,
+  type = "button",
 }: ButtonProps) {
   const styles =
     variant === "primary"
-      ? "bg-[var(--citron)] text-[var(--deep-moss)] hover:bg-[var(--white)]"
-      : "border border-[var(--deep-moss)] text-[var(--deep-moss)] hover:bg-[var(--deep-moss)] hover:text-[var(--white)]";
+      ? "bg-(--citron) text-(--deep-moss) hover:bg-(--white)"
+      : "border border-(--deep-moss) text-(--deep-moss) hover:bg-(--deep-moss) hover:text-(--white)";
 
   const classes = `
     inline-flex items-center justify-center gap-2
@@ -30,14 +34,14 @@ export default function Button({
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} aria-disabled={disabled}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button className={classes}>
+    <button className={classes} type={type} disabled={disabled}>
       {children}
     </button>
   );

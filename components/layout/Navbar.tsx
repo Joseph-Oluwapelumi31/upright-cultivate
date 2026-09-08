@@ -48,7 +48,8 @@ export default function Navbar() {
         <Link
           href="#"
           aria-label="Upright Cultivate home"
-          className="flex items-center gap-2.5 rounded-full border border-white/30 bg-white/55 px-4 py-2.5 font-[var(--font-display)] text-xl font-medium text-[var(--primary)] shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-200 hover:bg-white/70 max-[650px]:text-[17px]"
+          className="flex items-center gap-2.5 rounded-full border border-white/30 bg-white/55 px-4 py-2.5 text-xl font-medium shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-200 hover:bg-white/70 max-[650px]:text-[17px]"
+          style={{ fontFamily: "var(--font-display)", color: "var(--primary)" }}
         >
           <svg
             width="27"
@@ -86,7 +87,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop navigation */}
-        <div className="flex items-center gap-2 rounded-full bg-[var(--white)]/90 px-2 py-2 shadow-sm backdrop-blur-sm max-[900px]:hidden">
+        <div className="flex items-center gap-2 rounded-full bg-(--white)/90 px-2 py-2 shadow-sm backdrop-blur-sm max-[900px]:hidden">
           <nav
             className="flex items-center gap-1"
             aria-label="Main navigation"
@@ -95,7 +96,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full px-4 py-2.5 text-[13px] text-[var(--deep-moss)] opacity-80 transition-all duration-200 hover:bg-[var(--cream)] hover:opacity-100"
+                className="rounded-full px-4 py-2.5 text-[13px] text-(--deep-moss) opacity-80 transition-all duration-200 hover:bg-(--cream) hover:opacity-100"
               >
                 {link.label}
               </Link>
@@ -104,7 +105,7 @@ export default function Navbar() {
 
           <Link
             href="#contact"
-            className="inline-flex min-h-[42px] items-center justify-center rounded-full bg-[var(--primary)] px-5 py-2.5 text-[13px] font-medium text-[var(--primary-foreground)] transition-transform duration-[180ms] hover:-translate-y-0.5"
+            className="inline-flex min-h-[42px] items-center justify-center rounded-full bg-(--primary) px-5 py-2.5 text-[13px] font-medium text-(--primary-foreground) transition-transform duration-180 hover:-translate-y-0.5"
           >
             Request supply plan
           </Link>

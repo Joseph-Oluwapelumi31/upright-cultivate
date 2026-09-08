@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 
@@ -25,6 +28,60 @@ const steps = [
 ];
 
 export default function HowItWorks() {
+  const cardsRef = useRef<(HTMLElement | null)[]>([]);
+
+  useEffect(() => {
+    let ticking = false;
+
+    const update = () => {
+      const cards = cardsRef.current;
+
+      cards.forEach((card, index) => {
+        if (!card || index === cards.length - 1) return;
+
+        const nextCard = cards[index + 1];
+
+        if (!nextCard) return;
+
+        const nextRect = nextCard.getBoundingClientRect();
+
+        // Start fading when the next card approaches the stack
+        const start = window.innerHeight * 0.72;
+        const end = window.innerHeight * 0.28;
+
+        const progress = Math.min(
+          Math.max((start - nextRect.top) / (start - end), 0),
+          1
+        );
+
+        const opacity = 1 - progress * 0.65;
+        const scale = 1 - progress * 0.035;
+
+        card.style.opacity = `${opacity}`;
+        card.style.transform = `scale(${scale})`;
+      });
+
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(update);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    update();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <section id="how-it-works" className="py-24 sm:py-32">
       <Container>
@@ -33,20 +90,44 @@ export default function HowItWorks() {
           title="A simpler route from growing to your kitchen."
         />
 
-        <div className="mt-16 grid gap-px overflow-hidden rounded-[2rem] bg-[var(--deep-moss)]/10 md:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step) => (
-            <article key={step.number} className="bg-[var(--cream)] p-8">
-              <span className="text-sm text-[var(--copper)]">
-                {step.number}
-              </span>
+        <div className="mt-16 grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+          {/* Left side */}
+          <div className="lg:sticky lg:top-32 lg:self-start">
+            <p className="max-w-sm text-(--forest)/70">
+              From planning your supply to delivering fresh produce, every
+              step is built around your business.
+            </p>
+          </div>
 
-              <h3 className="mt-20 text-2xl">{step.title}</h3>
+          {/* Card stack */}
+          <div className="relative">
+            {steps.map((step, index) => (
+              <article
+                key={step.number}
+                ref={(el) => {
+                  cardsRef.current[index] = el;
+                }}
+                className="sticky top-32 mb-6 min-h-[420px] rounded-4xl bg-(--cream) p-8 ring-1 ring-(--deep-moss)/10 will-change-transform sm:p-12"
+                style={{
+                  zIndex: index + 1,
+                }}
+              >
+                <span className="text-sm text-(--copper)">
+                  {step.number}
+                </span>
 
-              <p className="mt-4 text-sm leading-6 text-[var(--forest)]/70">
-                {step.text}
-              </p>
-            </article>
-          ))}
+                <div className="mt-20 max-w-xl">
+                  <h3 className="text-2xl sm:text-4xl">
+                    {step.title}
+                  </h3>
+
+                  <p className="mt-4 max-w-md text-sm leading-6 text-(--forest)/70 sm:text-base">
+                    {step.text}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </Container>
     </section>

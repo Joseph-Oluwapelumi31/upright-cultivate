@@ -25,7 +25,7 @@ export default function SupplyPlanner() {
   return (
     <section
       id="supply-planner"
-      className="bg-[var(--deep-moss)] py-24 text-[var(--white)] sm:py-32"
+      className="bg-(--deep-moss) py-24 text-(--white) sm:py-32"
     >
       <Container>
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
@@ -37,7 +37,7 @@ export default function SupplyPlanner() {
 
           <form
             onSubmit={handleSubmit}
-            className="rounded-[2rem] bg-[var(--white)] p-7 text-[var(--deep-moss)] sm:p-10"
+            className="rounded-4xl bg-(--white) p-7 text-(--deep-moss) sm:p-10"
           >
             <div>
               <label className="text-sm font-medium">
@@ -48,7 +48,7 @@ export default function SupplyPlanner() {
                 {produceOptions.map((produce) => (
                   <label
                     key={produce}
-                    className="flex cursor-pointer items-center gap-2 rounded-xl border border-[var(--deep-moss)]/10 p-3 text-sm"
+                    className="flex cursor-pointer items-center gap-2 rounded-xl border border-(--deep-moss)/10 p-3 text-sm"
                   >
                     <input
                       type="checkbox"
@@ -62,16 +62,13 @@ export default function SupplyPlanner() {
             </div>
 
             <div className="mt-8">
-              <label
-                htmlFor="frequency"
-                className="text-sm font-medium"
-              >
+              <label htmlFor="frequency" className="text-sm font-medium">
                 Delivery frequency
               </label>
 
               <select
                 id="frequency"
-                className="mt-3 w-full rounded-xl border border-[var(--deep-moss)]/15 bg-transparent px-4 py-3 outline-none"
+                className="mt-3 w-full rounded-xl border border-(--deep-moss)/15 bg-transparent px-4 py-3 outline-none"
               >
                 <option>Weekly</option>
                 <option>Twice a week</option>
@@ -81,16 +78,13 @@ export default function SupplyPlanner() {
             </div>
 
             <div className="mt-8">
-              <label
-                htmlFor="business"
-                className="text-sm font-medium"
-              >
+              <label htmlFor="business" className="text-sm font-medium">
                 Business type
               </label>
 
               <select
                 id="business"
-                className="mt-3 w-full rounded-xl border border-[var(--deep-moss)]/15 bg-transparent px-4 py-3 outline-none"
+                className="mt-3 w-full rounded-xl border border-(--deep-moss)/15 bg-transparent px-4 py-3 outline-none"
               >
                 <option>Restaurant</option>
                 <option>Hotel</option>
@@ -102,10 +96,7 @@ export default function SupplyPlanner() {
             </div>
 
             <div className="mt-8">
-              <label
-                htmlFor="volume"
-                className="text-sm font-medium"
-              >
+              <label htmlFor="volume" className="text-sm font-medium">
                 Estimated weekly volume
               </label>
 
@@ -113,18 +104,16 @@ export default function SupplyPlanner() {
                 id="volume"
                 type="text"
                 placeholder="e.g. 20kg"
-                className="mt-3 w-full rounded-xl border border-[var(--deep-moss)]/15 bg-transparent px-4 py-3 outline-none"
+                className="mt-3 w-full rounded-xl border border-(--deep-moss)/15 bg-transparent px-4 py-3 outline-none"
               />
             </div>
 
             <div className="mt-8">
-              <Button>
-                Request supply plan →
-              </Button>
+              <Button>Request supply plan →</Button>
             </div>
 
             {submitted && (
-              <p className="mt-5 text-sm text-[var(--olive)]">
+              <p className="mt-5 text-sm text-(--olive)">
                 Thanks. Your request has been captured.
               </p>
             )}
