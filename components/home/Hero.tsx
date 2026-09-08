@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowDownRight } from "lucide-react";
 import {
@@ -23,11 +24,20 @@ export default function Hero() {
       {/* Background */}
       <motion.div
         aria-hidden="true"
-        className="absolute inset-0 scale-105 bg-[url('/farm-hero.jpg')] bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 scale-105"
         style={{
           y: prefersReducedMotion ? 0 : y,
         }}
-      />
+      >
+        <Image
+          src="/farm-hero.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+      </motion.div>
 
       {/* Overlay */}
       <div
