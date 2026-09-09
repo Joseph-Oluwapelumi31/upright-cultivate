@@ -14,9 +14,33 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Upright Cultivate — Freshness Your Kitchen Can Count On",
+  title: "Fresh Leafy Greens & Culinary Herbs Supplier in Nigeria | Upright Cultivate",
   description:
-    "Fresh leafy greens and culinary herbs grown closer to the businesses that need them.",
+    "Upright Cultivate supplies fresh leafy greens and culinary herbs to restaurants, hotels, cafés, supermarkets, caterers, and commercial kitchens in Nigeria.",
+
+  keywords: [
+    "leafy greens supplier Nigeria",
+    "fresh herbs supplier Nigeria",
+    "fresh produce supplier Nigeria",
+    "aeroponic farming Nigeria",
+    "leafy greens Lagos",
+    "culinary herbs Lagos",
+    "fresh vegetables Lagos",
+  ],
+
+  openGraph: {
+    title:
+      "Fresh Leafy Greens & Culinary Herbs Supplier in Nigeria | Upright Cultivate",
+    description:
+      "Fresh leafy greens and culinary herbs grown closer to the businesses that need them.",
+    type: "website",
+    siteName: "Upright Cultivate",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -26,9 +50,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${bricolage.variable} ${poppins.variable}`}
-      >
+      <body className={`${bricolage.variable} ${poppins.variable}`}>
         {children}
       </body>
     </html>
