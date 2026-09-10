@@ -34,3 +34,32 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+Phase 1 — Products
+
+Create proper product data
+Make product cards interactive
+Add product details
+Add “Add to supply plan”
+
+Phase 2 — Supply Planner
+5. Build planner state
+6. Add/remove products
+7. Quantity controls
+8. Frequency selector
+9. Delivery/location fields
+10. Generate plan summary
+
+Phase 3 — Submission
+11. Build request form
+12. Validate it
+13. Create backend endpoint/server action
+14. Send/store the request
+15. Success state
+
+Phase 4 — Polish
+16. Mobile UX
+17. Loading/error states
+18. Empty states
+19. Accessibility
+20. Then revisit performance

@@ -10,9 +10,11 @@ import FinalCTA from "@/components/home/FinalCTA";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import MobileNav from "@/components/layout/MobileNav";
+import { SupplyPlanProvider } from "@/components/supply-plan/SupplyPlanProvider";
+
 export default function Home() {
   return (
-    <>
+    <SupplyPlanProvider>
       <Navbar />
       <MobileNav />
       <main>
@@ -28,6 +30,6 @@ export default function Home() {
       </main>
 
       <Footer />
-    </>
+    </SupplyPlanProvider>
   );
 }
