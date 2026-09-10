@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { ArrowLeft, Check } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useSupplyPlan } from "@/components/supply-plan/SupplyPlanProvider";
@@ -13,6 +13,7 @@ type SupplyRequestFormProps = {
   frequency: string;
   businessType: string;
   onBack: () => void;
+  onSuccess: () => void;
 };
 
 const initialState: SupplyRequestState = {
@@ -24,6 +25,7 @@ export default function SupplyRequestForm({
   frequency,
   businessType,
   onBack,
+  onSuccess,
 }: SupplyRequestFormProps) {
   const { items } = useSupplyPlan();
 
@@ -31,6 +33,10 @@ export default function SupplyRequestForm({
     submitSupplyRequest,
     initialState
   );
+
+  useEffect(() => {
+    if (state.success) onSuccess();
+  }, [onSuccess, state.success]);
 
   const totalQuantity = items.reduce(
     (total, item) => total + item.quantity,

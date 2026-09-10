@@ -528,7 +528,7 @@ export default function SupplyPlanner() {
                               </p>
                             ) : (
                               <p className="mt-2 text-xs leading-relaxed text-(--foreground)/50">
-                                We'll determine this with you.
+                                We&apos;ll determine this with you.
                               </p>
                             )}
                           </div>
@@ -592,7 +592,7 @@ export default function SupplyPlanner() {
                         </h3>
 
                         <p className="mt-2 max-w-lg text-sm leading-relaxed text-(--foreground)/55">
-                          Thanks for sharing your requirements. We'll
+                          Thanks for sharing your requirements. We&apos;ll
                           review your request and get in touch to
                           confirm availability and delivery details.
                         </p>
@@ -610,7 +610,7 @@ export default function SupplyPlanner() {
                           </p>
 
                           <p className="mt-1 text-xs text-(--foreground)/45">
-                            What you've asked us to supply.
+                            What you&apos;ve asked us to supply.
                           </p>
                         </div>
 
@@ -794,10 +794,8 @@ export default function SupplyPlanner() {
 
             <div className="overflow-y-auto p-6 sm:p-8">
               <SupplyRequestForm
-                items={items}
                 frequency={frequency}
                 businessType={businessType}
-                weeklyTotals={weeklyTotals}
                 onBack={() => setStep("plan")}
                 onSuccess={handleRequestReceived}
               />
@@ -901,10 +899,7 @@ export default function SupplyPlanner() {
                               addItem({
                                 id: product.id,
                                 name: product.name,
-                                unit:
-                                  "unit" in product
-                                    ? String(product.unit)
-                                    : "kg",
+                                unit: "kg",
                               })
                             }
                             className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-colors ${
