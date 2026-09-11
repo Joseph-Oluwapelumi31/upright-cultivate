@@ -37,12 +37,12 @@ export default function Solution() {
   return (
     <section
       aria-labelledby="solution-heading"
-      className="bg-(--primary) py-24 text-(--primary-foreground) sm:py-32"
+      className="bg-(--secondary) py-24 text-(--primary-foreground) sm:py-32"
     >
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Image */}
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] bg-(--secondary) lg:aspect-auto lg:min-h-[500px]">
+          <div className="relative aspect-4/3 overflow-hidden rounded-4xl bg-(--secondary) lg:aspect-auto lg:min-h-125">
             <Image
               src="/indoor-farm.jpg"
               alt="Leafy greens growing inside an indoor controlled-environment farm"
@@ -72,7 +72,7 @@ export default function Solution() {
 
             <h2
               id="solution-heading"
-              className="max-w-lg font-(--font-display) text-4xl font-medium leading-[0.95] tracking-[-0.05em] sm:text-5xl lg:text-6xl"
+              className="max-w-lg font-display text-4xl font-medium leading-[0.95] tracking-tighter sm:text-5xl lg:text-6xl"
             >
               Grow closer. Plan smarter. Deliver fresher.
             </h2>
@@ -112,7 +112,7 @@ export default function Solution() {
             <div className="mt-8">
               <Link
                 href="#supply-planner"
-                className="inline-flex items-center gap-2 text-sm font-medium text-(--accent) transition-[opacity,transform] duration-200 hover:-translate-y-0.5 hover:opacity-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent)/60 focus-visible:ring-offset-4 focus-visible:ring-offset-(--primary)"
+                className="inline-flex items-center gap-2 text-sm font-medium text-(--accent) transition-[opacity,transform] duration-200 hover:-translate-y-0.5 hover:opacity-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent)/60 focus-visible:ring-offset-4 focus-visible:ring-offset-(--secondary)"
               >
                 Plan your supply
                 <ArrowRight size={16} strokeWidth={2.5} />

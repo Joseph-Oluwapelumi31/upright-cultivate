@@ -329,8 +329,8 @@
                     <div
                       className={
                         index % 2 !== 0
-                          ? "md:order-1"
-                          : "md:order-2"
+                          ? "min-w-0 md:order-1"
+                          : "min-w-0 md:order-2"
                       }
                     >
                       <h3 className="max-w-lg  text-3xl font-medium leading-tight tracking-[-0.03em] text-(--primary) sm:text-4xl">
@@ -339,7 +339,7 @@
 
                       <div className="mt-7 max-w-xl border-t border-(--primary)/15 pt-5">
                         {/* Products */}
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex min-w-0 max-w-full flex-nowrap gap-2 overflow-x-auto pb-2 scrollbar-none md:flex-wrap md:overflow-visible md:pb-0">
                           {items.map((item) => {
                             const isSelected =
                               selectedProduct === item.id;
@@ -356,7 +356,7 @@
                                 }
                                 aria-pressed={isSelected}
                                 aria-label={`Select ${item.name}`}
-                                className={`group/item inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-[background-color,border-color,color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
+                                className={`group/item inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm transition-[background-color,border-color,color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 md:shrink ${
                                   isSelected
                                     ? "border-(--primary) bg-(--primary) text-white"
                                     : isInPlan
@@ -383,59 +383,73 @@
                           if (selectedProduct !== item.id) {
                             return null;
                           }
-
+                        
                           const isInPlan = isProductInPlan(item.id);
-
+                        
                           return (
                             <div
                               key={`${item.id}-details`}
                               className="mt-5 rounded-2xl border border-(--primary)/10 bg-(--background)/50 p-5"
                             >
-                              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                <div>
-                                  <p className="text-sm font-medium text-(--primary)">
-                                    {item.name}
-                                  </p>
-
-                                  <p className="mt-2 max-w-lg text-sm leading-relaxed text-(--foreground)/65">
-                                    {item.description}
-                                  </p>
-                                </div>
-
-                                <span className="shrink-0 rounded-full bg-(--highlight)/15 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-(--primary)">
-                                  {isInPlan ? "In your plan" : "Add to plan"}
-                                </span>
+                              {/* Product identity */}
+                              <div>
+                                <p className="text-xs font-medium uppercase tracking-wider text-(--foreground)/45">
+          Selected produce
+                                </p>
+                          
+                                <h3 className="mt-1 text-lg font-semibold text-(--foreground)">
+                                  {item.name}
+                                </h3>
                               </div>
-
-                              <button
-                                type="button"
-                                disabled={isInPlan}
-                                onClick={() => {
-                                  addItem({
-                                    id: item.id,
-                                    name: item.name,
-                                    unit: "kg",
-                                  });
-                                }}
-                                className={`mt-5 cursor-pointer inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-[transform,opacity,background-color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
-                                  isInPlan
-                                    ? "cursor-default bg-(--primary)/10 text-(--primary)"
-                                    : "bg-(--primary) text-white hover:-translate-y-0.5 hover:opacity-90"
-                                }`}
-                              >
-                                {isInPlan ? (
-                                  <>
-                                    <Check
-                                      size={15}
-                                      strokeWidth={2.5}
-                                      aria-hidden="true"
-                                    />
-                                    Added to supply plan
-                                  </>
-                                ) : (
-                                  `Add to supply plan`
+                          
+                              {/* Product description */}
+                              <p className="mt-3 max-w-lg text-sm leading-relaxed text-(--foreground)/65">
+                                {item.description}
+                              </p>
+                          
+                              {/* Actions */}
+                              <div className="mt-5 flex flex-wrap items-center gap-4">
+                                <button
+                                  type="button"
+                                  disabled={isInPlan}
+                                  onClick={() => {
+                                    addItem({
+                                      id: item.id,
+                                      name: item.name,
+                                      unit: "kg",
+                                    });
+                                  }}
+                                  className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-[transform,opacity,background-color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
+                                    isInPlan
+                                      ? "cursor-default bg-(--primary)/10 text-(--primary)"
+                                      : "bg-(--primary) text-white hover:-translate-y-0.5 hover:opacity-90"
+                                  }`}
+                                >
+                                  {isInPlan ? (
+                                    <>
+                                      <Check
+                                        size={15}
+                                        strokeWidth={2.5}
+                                        aria-hidden="true"
+                                      />
+                                      Added to supply plan
+                                    </>
+                                  ) : (
+                                    "Add to supply plan"
+                                  )}
+                                </button>
+                                
+                                {/* Only show after the product has been added */}
+                                {isInPlan && (
+                                  <a
+                                    href="#supply-planner"
+                                    className="inline-flex items-center gap-1 text-sm font-medium text-(--foreground)/60 underline-offset-4 transition-colors hover:text-(--primary) hover:underline"
+                                  >
+                                    Review supply plan
+                                    <span aria-hidden="true">→</span>
+                                  </a>
                                 )}
-                              </button>
+                              </div>
                             </div>
                           );
                         })}

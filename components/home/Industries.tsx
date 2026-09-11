@@ -1,3 +1,6 @@
+"use client";
+
+import { motion, useReducedMotion } from "motion/react";
 import Container from "@/components/ui/Container";
 import { ChefHat, ShoppingBasket, UtensilsCrossed } from "lucide-react";
 
@@ -20,6 +23,8 @@ const industries = [
 ];
 
 export default function Industries() {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <section
       id="industries"
@@ -41,10 +46,27 @@ export default function Industries() {
 
         {/* Industry cards */}
         <div className="grid border-t border-(--primary)/15 md:grid-cols-3">
-          {industries.map(({ title, text, icon: Icon }) => (
-            <article
+          {industries.map(({ title, text, icon: Icon }, index) => (
+            <motion.article
               key={title}
               className="border-b border-(--primary)/15 py-8 md:border-b-0 md:border-r md:px-8 md:py-10 first:md:pl-0 last:md:border-r-0 last:md:pr-0"
+              initial={
+                prefersReducedMotion
+                  ? { opacity: 1, rotateX: 0, y: 0 }
+                  : { opacity: 0, rotateX: -75, y: 56 }
+              }
+              whileInView={{ opacity: 1, rotateX: 0, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{
+                duration: 0.8,
+                delay: prefersReducedMotion ? 0 : index * 0.14,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              style={{
+                transformOrigin: "top center",
+                transformPerspective: 900,
+                zIndex: industries.length - index,
+              }}
             >
               <div
                 className="mb-8 flex h-10 w-10 items-center justify-center rounded-full border border-(--highlight)/30 bg-(--surface) text-(--highlight)"
@@ -60,7 +82,7 @@ export default function Industries() {
               <p className="mt-3 max-w-sm text-sm leading-relaxed text-(--foreground)/65">
                 {text}
               </p>
-            </article>
+            </motion.article>
           ))}
         </div>
       </Container>
