@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import Button from "@/components/ui/Button";
+import Container from "@/components/ui/Container";
 
 const navLinks = [
   { label: "Why us", href: "#why" },
@@ -60,7 +62,7 @@ export default function MobileNav() {
       {/* Backdrop */}
       {menuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-md min-[901px]:hidden"
+          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-md lg:hidden"
           onClick={closeMenu}
           aria-hidden="true"
         />
@@ -68,64 +70,75 @@ export default function MobileNav() {
 
       {/* Mobile navigation */}
       <div
-        className={`fixed left-0 right-0 top-0 z-50 px-6 py-7 transition-transform duration-300 min-[901px]:hidden ${
+        className={`fixed left-0 right-0 top-0 z-50 py-7 transition-transform duration-300 lg:hidden ${
           showNavbar ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        {/* Menu button */}
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-navigation"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            className="cursor-pointer rounded-full border border-white/30 bg-white/55 p-3 text-primary shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/70"
-          >
-            {menuOpen ? (
-              <X className="h-4 w-4" />
-            ) : (
-              <Menu className="h-4 w-4" />
-            )}
-          </button>
-        </div>
+        <Container className="relative lg:hidden">
+          <div className="flex items-center justify-between">
+            <Link
+              href="#"
+              aria-label="Upright Cultivate home"
+              className="flex size-14 shrink-0 items-center justify-center rounded-full border border-white/30 bg-white/55 text-primary transition-colors duration-200 hover:bg-white/70"
+            >
+              <Image
+                src="/logo.png"
+                alt=""
+                width={32}
+                height={32}
+                priority
+                className="size-8"
+              />
+            </Link>
 
-        {/* Mobile menu */}
-        <div
-          className={`absolute left-6 right-6 top-[calc(100%+12px)] origin-top transition-[transform,opacity] duration-300 ${
-            menuOpen
-              ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-              : "pointer-events-none -translate-y-2 scale-[0.98] opacity-0"
-          }`}
-        >
-          <nav
-            id="mobile-navigation"
-            aria-label="Mobile navigation"
-            className="rounded-3xl border border-white/30 bg-white/65 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.12)] backdrop-blur-2xl"
+            <button
+              type="button"
+              onClick={() => setMenuOpen((open) => !open)}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-navigation"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              className="flex size-14 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/30 bg-white/55 text-primary backdrop-blur-xl transition-colors duration-200 hover:bg-white/70"
+            >
+              {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
+          </div>
+
+          <div
+            className={`absolute left-5 right-5 top-[calc(100%+12px)] origin-top transition-[transform,opacity] duration-300 sm:left-8 sm:right-8 lg:left-12 lg:right-12 ${
+              menuOpen
+                ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
+                : "pointer-events-none -translate-y-2 scale-[0.98] opacity-0"
+            }`}
           >
-            <div className="flex flex-col gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
+            <nav
+              id="mobile-navigation"
+              aria-label="Mobile navigation"
+              className="rounded-3xl border border-white/30 bg-white/65 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.12)] backdrop-blur-2xl"
+            >
+              <div className="flex flex-col gap-1">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={closeMenu}
+                    className="rounded-2xl px-4 py-3.5 text-sm font-medium text-(--primary) opacity-80 transition-colors duration-200 hover:bg-white/60 hover:opacity-100"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+
+                <Button
+                  href="#supply-planner"
+                  variant="primary"
+                  className="mt-2 w-full text-sm"
                   onClick={closeMenu}
-                  className="rounded-2xl px-4 py-3.5 text-sm font-medium text-(--primary) opacity-80 transition-colors duration-200 hover:bg-white/60 hover:opacity-100"
                 >
-                  {link.label}
-                </Link>
-              ))}
-
-              <Button
-                href="#supply-planner"
-                variant="primary"
-                className="mt-2 w-full text-sm"
-                onClick={closeMenu}
-              >
-                Request supply plan
-              </Button>
-            </div>
-          </nav>
-        </div>
+                  Request supply plan
+                </Button>
+              </div>
+            </nav>
+          </div>
+        </Container>
       </div>
     </>
   );
