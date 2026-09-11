@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -242,6 +242,64 @@ export default function SupplyPlanner() {
     frequencies.find(
       (option) => option.value === frequency
     ) ?? frequencies[0];
+
+  const activeDialog =
+    isPickerOpen || activeOption !== null || step === "request";
+
+  useEffect(() => {
+    if (!activeDialog) return;
+
+    const dialogs = document.querySelectorAll<HTMLElement>(
+      '[role="dialog"]'
+    );
+    const dialog = dialogs[dialogs.length - 1];
+
+    if (!dialog) return;
+
+    const focusableSelector =
+      'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () =>
+      Array.from(
+        dialog.querySelectorAll<HTMLElement>(focusableSelector)
+      );
+
+    getFocusable()[0]?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (step === "request") {
+          setStep("review");
+        } else if (activeOption) {
+          setActiveOption(null);
+        } else {
+          closePicker();
+        }
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const focusable = getFocusable();
+      if (focusable.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [activeDialog, activeOption, step]);
 
   return (
     <section

@@ -39,12 +39,21 @@ export default function Button({
   const styles = `${baseStyles} ${variants[variant]} ${className}`;
 
   if (href) {
+    if (disabled) {
+      return (
+        <span
+          className={styles}
+          aria-disabled="true"
+        >
+          {children}
+        </span>
+      );
+    }
+
     return (
       <Link
         href={href}
         className={styles}
-        aria-disabled={disabled}
-        tabIndex={disabled ? -1 : undefined}
       >
         {children}
       </Link>

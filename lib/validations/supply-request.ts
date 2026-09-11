@@ -1,5 +1,50 @@
 import { z } from "zod";
 
+const productIds = [
+  "romaine",
+  "butterhead",
+  "green-leaf",
+  "red-leaf",
+  "iceberg",
+  "kale",
+  "spinach",
+  "swiss-chard",
+  "arugula",
+  "watercress",
+  "bok-choy",
+  "pak-choi",
+  "basil",
+  "mint",
+  "parsley",
+  "coriander",
+  "dill",
+  "chives",
+  "oregano",
+  "thyme",
+  "spring-onions",
+  "custom-blends",
+] as const;
+
+const frequencies = [
+  "Weekly",
+  "Twice a week",
+  "Multiple times a week",
+  "Not sure yet",
+] as const;
+
+const businessTypes = [
+  "Restaurant",
+  "Hotel",
+  "Café",
+  "Retail",
+  "Catering",
+  "Meal prep",
+  "Commercial kitchen",
+  "Other",
+] as const;
+
+const productIdSchema = z.enum(productIds);
+
 export const supplyRequestSchema = z.object({
   fullName: z
     .string()
@@ -36,16 +81,24 @@ export const supplyRequestSchema = z.object({
     .max(1000, "Notes are too long.")
     .optional(),
 
-  frequency: z.string().min(1, "Please select a delivery frequency."),
+  frequency: z.enum(frequencies, {
+    error: "Please select a delivery frequency.",
+  }),
 
-  businessType: z.string().min(1, "Please select your business type."),
+  businessType: z.enum(businessTypes, {
+    error: "Please select your business type.",
+  }),
 
   items: z
     .array(
       z.object({
-        id: z.string(),
-        name: z.string(),
-        quantity: z.number().int().positive(),
+        id: productIdSchema,
+        name: z.string().trim().min(1).max(100),
+        quantity: z
+          .number()
+          .int()
+          .min(1, "Quantity must be at least 1 kg.")
+          .max(500, "Quantity cannot exceed 500 kg."),
         unit: z.literal("kg"),
       })
     )

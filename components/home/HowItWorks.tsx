@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useReducedMotion } from "motion/react";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 
@@ -29,8 +30,11 @@ const steps = [
 
 export default function HowItWorks() {
   const cardsRef = useRef<(HTMLElement | null)[]>([]);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
+
     let ticking = false;
 
     const update = () => {
@@ -79,7 +83,7 @@ export default function HowItWorks() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <section
@@ -109,7 +113,7 @@ export default function HowItWorks() {
                 ref={(el) => {
                   cardsRef.current[index] = el;
                 }}
-                className="sticky top-32 mb-6 min-h-[420px] rounded-[2rem] bg-(--surface) p-8 ring-1 ring-(--primary)/10 will-change-transform sm:p-12"
+                className="sticky top-32 mb-6 min-h-105 rounded-4xl bg-(--surface) p-8 ring-1 ring-(--primary)/10 will-change-transform sm:p-12"
                 style={{
                   zIndex: index + 1,
                 }}
@@ -121,7 +125,7 @@ export default function HowItWorks() {
 
                 {/* Content */}
                 <div className="mt-20 max-w-xl">
-                  <h3 className="font-(--font-display) text-2xl font-medium leading-tight tracking-[-0.03em] text-(--primary) sm:text-4xl">
+                  <h3 className="font-display text-2xl font-medium leading-tight tracking-tight text-(--primary) sm:text-4xl">
                     {step.title}
                   </h3>
 

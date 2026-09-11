@@ -79,7 +79,7 @@ export default function SupplyRequestForm({
   const fieldErrors = state.fieldErrors ?? {};
 
   return (
-    <form action={formAction}>
+    <form action={formAction} aria-busy={pending}>
       <button
         type="button"
         onClick={onBack}
@@ -119,11 +119,13 @@ export default function SupplyRequestForm({
           autoComplete="name"
           placeholder="Your name"
           required
+          aria-invalid={Boolean(fieldErrors.fullName)}
+          aria-describedby={fieldErrors.fullName ? "fullName-error" : undefined}
           className="mt-3 w-full rounded-xl border border-(--primary)/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-(--foreground)/35 focus:border-(--primary)/40 focus:ring-2 focus:ring-(--primary)/10"
         />
 
         {fieldErrors.fullName?.[0] && (
-          <p className="mt-2 text-xs text-red-600">
+          <p id="fullName-error" className="mt-2 text-xs text-red-600">
             {fieldErrors.fullName[0]}
           </p>
         )}
@@ -145,11 +147,13 @@ export default function SupplyRequestForm({
           autoComplete="organization"
           placeholder="Your business"
           required
+          aria-invalid={Boolean(fieldErrors.businessName)}
+          aria-describedby={fieldErrors.businessName ? "businessName-error" : undefined}
           className="mt-3 w-full rounded-xl border border-(--primary)/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-(--foreground)/35 focus:border-(--primary)/40 focus:ring-2 focus:ring-(--primary)/10"
         />
 
         {fieldErrors.businessName?.[0] && (
-          <p className="mt-2 text-xs text-red-600">
+          <p id="businessName-error" className="mt-2 text-xs text-red-600">
             {fieldErrors.businessName[0]}
           </p>
         )}
@@ -171,11 +175,13 @@ export default function SupplyRequestForm({
           autoComplete="email"
           placeholder="you@business.com"
           required
+          aria-invalid={Boolean(fieldErrors.email)}
+          aria-describedby={fieldErrors.email ? "email-error" : undefined}
           className="mt-3 w-full rounded-xl border border-(--primary)/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-(--foreground)/35 focus:border-(--primary)/40 focus:ring-2 focus:ring-(--primary)/10"
         />
 
         {fieldErrors.email?.[0] && (
-          <p className="mt-2 text-xs text-red-600">
+          <p id="email-error" className="mt-2 text-xs text-red-600">
             {fieldErrors.email[0]}
           </p>
         )}
@@ -197,11 +203,13 @@ export default function SupplyRequestForm({
           autoComplete="tel"
           placeholder="+234..."
           required
+          aria-invalid={Boolean(fieldErrors.phone)}
+          aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
           className="mt-3 w-full rounded-xl border border-(--primary)/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-(--foreground)/35 focus:border-(--primary)/40 focus:ring-2 focus:ring-(--primary)/10"
         />
 
         {fieldErrors.phone?.[0] && (
-          <p className="mt-2 text-xs text-red-600">
+          <p id="phone-error" className="mt-2 text-xs text-red-600">
             {fieldErrors.phone[0]}
           </p>
         )}
@@ -223,11 +231,13 @@ export default function SupplyRequestForm({
           autoComplete="street-address"
           placeholder="Area / address"
           required
+          aria-invalid={Boolean(fieldErrors.deliveryLocation)}
+          aria-describedby={fieldErrors.deliveryLocation ? "deliveryLocation-error" : undefined}
           className="mt-3 w-full rounded-xl border border-(--primary)/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-(--foreground)/35 focus:border-(--primary)/40 focus:ring-2 focus:ring-(--primary)/10"
         />
 
         {fieldErrors.deliveryLocation?.[0] && (
-          <p className="mt-2 text-xs text-red-600">
+          <p id="deliveryLocation-error" className="mt-2 text-xs text-red-600">
             {fieldErrors.deliveryLocation[0]}
           </p>
         )}
@@ -250,8 +260,16 @@ export default function SupplyRequestForm({
           name="notes"
           rows={4}
           placeholder="Anything else we should know about your supply needs?"
+          aria-invalid={Boolean(fieldErrors.notes)}
+          aria-describedby={fieldErrors.notes ? "notes-error" : undefined}
           className="mt-3 w-full resize-none rounded-xl border border-(--primary)/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-(--foreground)/35 focus:border-(--primary)/40 focus:ring-2 focus:ring-(--primary)/10"
         />
+
+        {fieldErrors.notes?.[0] && (
+          <p id="notes-error" className="mt-2 text-xs text-red-600">
+            {fieldErrors.notes[0]}
+          </p>
+        )}
       </div>
 
       {/* Hidden supply data */}
@@ -309,7 +327,7 @@ export default function SupplyRequestForm({
 
       {/* Server error */}
       {!state.success && state.message && (
-        <p className="mt-5 text-sm text-red-600">
+        <p className="mt-5 text-sm text-red-600" role="alert" aria-live="polite">
           {state.message}
         </p>
       )}

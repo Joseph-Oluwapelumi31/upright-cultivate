@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
@@ -16,6 +16,8 @@ const navLinks = [
 export default function MobileNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const firstLinkRef = useRef<HTMLAnchorElement>(null);
 
   // Show navbar when scrolling up, hide when scrolling down
   useEffect(() => {
@@ -53,9 +55,32 @@ export default function MobileNav() {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (menuOpen) {
+      firstLinkRef.current?.focus();
+    }
+  }, [menuOpen]);
+
   const closeMenu = () => {
     setMenuOpen(false);
+    window.requestAnimationFrame(() => {
+      menuButtonRef.current?.focus();
+    });
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && menuOpen) {
+        closeMenu();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
 
   return (
     <>
@@ -92,6 +117,7 @@ export default function MobileNav() {
             </Link>
 
             <button
+              ref={menuButtonRef}
               type="button"
               onClick={() => setMenuOpen((open) => !open)}
               aria-expanded={menuOpen}
@@ -113,12 +139,15 @@ export default function MobileNav() {
             <nav
               id="mobile-navigation"
               aria-label="Mobile navigation"
+              aria-hidden={!menuOpen}
+              inert={!menuOpen ? true : undefined}
               className="rounded-3xl border border-white/30 bg-white/65 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.12)] backdrop-blur-2xl"
             >
               <div className="flex flex-col gap-1">
-                {navLinks.map((link) => (
+                {navLinks.map((link, index) => (
                   <Link
                     key={link.href}
+                    ref={index === 0 ? firstLinkRef : undefined}
                     href={link.href}
                     onClick={closeMenu}
                     className="rounded-2xl px-4 py-3.5 text-sm font-medium text-(--primary) opacity-80 transition-colors duration-200 hover:bg-white/60 hover:opacity-100"
