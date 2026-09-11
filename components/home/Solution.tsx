@@ -47,7 +47,8 @@ export default function Solution() {
               src="/indoor-farm.jpg"
               alt="Leafy greens growing inside an indoor controlled-environment farm"
               fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
+              quality={60}
+              sizes="(min-width: 1280px) 560px, (min-width: 1024px) 45vw, 100vw"
               className="object-cover object-center"
             />
 

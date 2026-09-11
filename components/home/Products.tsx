@@ -252,7 +252,7 @@
                 Our produce
               </span>
 
-              <h2 className="font-(--font-display) text-4xl  leading-[1] tracking-tighter text-(--primary) sm:text-5xl md:text-6xl">
+              <h2 className="font-(--font-display) text-4xl leading-none tracking-tighter text-(--primary) sm:text-5xl md:text-6xl">
                 What we grow
               </h2>
             </div>
