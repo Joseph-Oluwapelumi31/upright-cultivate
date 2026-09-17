@@ -1,473 +1,596 @@
-  "use client";
+"use client";
 
-  import Image from "next/image";
-  import Container from "@/components/ui/Container";
-  import { Check } from "lucide-react";
-  import { useState } from "react";
-  import { motion, AnimatePresence } from "motion/react";
-  import { useSupplyPlan } from "@/components/supply-plan/SupplyPlanProvider";
+import Image from "next/image";
+import { ArrowUpRight, Check, Plus } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useMemo, useState } from "react";
 
-  // Direction-aware enter/exit for the product image swap
-  const imageVariants = {
-    enter: (direction: "left" | "right") => ({
-      opacity: 0,
-      x: direction === "left" ? -60 : 60,
-      scale: 0.92,
-      filter: "blur(8px)",
-    }),
-    center: {
-      opacity: 1,
-      x: 0,
-      scale: 1,
-      filter: "blur(0px)",
-    },
-    exit: (direction: "left" | "right") => ({
-      opacity: 0,
-      x: direction === "left" ? 60 : -60,
-      scale: 0.96,
-      filter: "blur(6px)",
-    }),
+import Container from "@/components/ui/Container";
+import Button from "@/components/ui/Button";
+import { useSupplyPlan } from "@/components/supply-plan/SupplyPlanProvider";
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface ProductGroup {
+  title: string;
+  items: Product[];
+  image: string;
+  alt: string;
+}
+
+const PRODUCT_IMAGES: Record<string, string> = {
+  romaine: "/products/romaine_lettuce.png",
+  butterhead: "/products/butterhead_lettuce.png",
+  "green-leaf": "/products/green_leaf_lettuce.png",
+  "red-leaf": "/products/red_leaf_lettuce.png",
+  iceberg: "/products/iceberg_lettuce.png",
+
+  kale: "/products/curly_kale.png",
+  spinach: "/products/spinach.png",
+  "swiss-chard": "/products/swiss_chard.png",
+  arugula: "/products/arugula.png",
+  watercress: "/products/watercress.png",
+  "bok-choy": "/products/baby_bok_choy.png",
+  "pak-choi": "/products/pak_choi.png",
+
+  basil: "/products/basil.png",
+  mint: "/products/mint.png",
+  parsley: "/products/fresh_parsley.png",
+  coriander: "/products/coriander_cilantro.png",
+
+  dill: "/products/dill.png",
+  chives: "/products/chives.png",
+  oregano: "/products/oregano.png",
+  thyme: "/products/thyme.png",
+  "spring-onions": "/products/spring_onions.png",
+};
+
+export const productGroups: ProductGroup[] = [
+  {
+    title: "Lettuce varieties",
+    items: [
+      {
+        id: "romaine",
+        name: "Romaine",
+        description:
+          "Crisp, structured leaves that work well in salads, wraps, and sandwiches.",
+      },
+      {
+        id: "butterhead",
+        name: "Butterhead",
+        description:
+          "Tender, soft leaves with a delicate texture for salads and plating.",
+      },
+      {
+        id: "green-leaf",
+        name: "Green leaf",
+        description:
+          "Versatile leafy greens suited to salads, sandwiches, and everyday kitchen use.",
+      },
+      {
+        id: "red-leaf",
+        name: "Red leaf",
+        description:
+          "Vibrant red-tinted leaves that add colour and freshness to salads and dishes.",
+      },
+      {
+        id: "iceberg",
+        name: "Iceberg",
+        description:
+          "Crisp, refreshing leaves that hold up well in high-volume kitchen service.",
+      },
+    ],
+    image: "/lettuce.png",
+    alt: "Freshly harvested lettuce varieties",
+  },
+
+  {
+    title: "Salad & cooking greens",
+    items: [
+      {
+        id: "kale",
+        name: "Kale",
+        description:
+          "Nutrient-rich leafy greens suited to salads, smoothies, and cooked dishes.",
+      },
+      {
+        id: "spinach",
+        name: "Spinach",
+        description:
+          "Tender, versatile greens for salads, cooking, smoothies, and food preparation.",
+      },
+      {
+        id: "swiss-chard",
+        name: "Swiss chard",
+        description:
+          "Colourful leafy greens with a rich flavour for salads and cooked dishes.",
+      },
+      {
+        id: "arugula",
+        name: "Arugula",
+        description:
+          "Peppery greens that add a distinctive flavour to salads, pizza, and plating.",
+      },
+      {
+        id: "watercress",
+        name: "Watercress",
+        description:
+          "Fresh, peppery leaves ideal for salads, garnishing, and premium dishes.",
+      },
+      {
+        id: "bok-choy",
+        name: "Bok choy",
+        description:
+          "Crisp Asian greens suited to stir-fries, soups, and other cooked dishes.",
+      },
+      {
+        id: "pak-choi",
+        name: "Pak choi",
+        description:
+          "Tender, crisp greens that work especially well in Asian-inspired dishes.",
+      },
+    ],
+    image: "/salad-greens.png",
+    alt: "Fresh salad and cooking greens",
+  },
+
+  {
+    title: "Fresh culinary herbs",
+    items: [
+      {
+        id: "basil",
+        name: "Basil",
+        description:
+          "Aromatic fresh herbs for sauces, salads, pasta, garnishing, and drinks.",
+      },
+      {
+        id: "mint",
+        name: "Mint",
+        description:
+          "Fresh, cooling herbs for drinks, desserts, salads, and culinary finishing.",
+      },
+      {
+        id: "parsley",
+        name: "Parsley",
+        description:
+          "Fresh aromatic herbs for seasoning, garnishing, sauces, and everyday cooking.",
+      },
+      {
+        id: "coriander",
+        name: "Coriander",
+        description:
+          "Fragrant herbs that bring freshness to sauces, salads, soups, and finished dishes.",
+      },
+    ],
+    image: "/herbs-1.png",
+    alt: "Fresh culinary herbs",
+  },
+
+  {
+    title: "Kitchen staples",
+    items: [
+      {
+        id: "dill",
+        name: "Dill",
+        description:
+          "Fresh aromatic herbs that pair well with salads, seafood, sauces, and pickles.",
+      },
+      {
+        id: "chives",
+        name: "Chives",
+        description:
+          "Mild onion-flavoured herbs ideal for finishing dishes, sauces, and salads.",
+      },
+      {
+        id: "oregano",
+        name: "Oregano",
+        description:
+          "Aromatic herbs suited to sauces, marinades, pizzas, and Mediterranean dishes.",
+      },
+      {
+        id: "thyme",
+        name: "Thyme",
+        description:
+          "Fragrant herbs that complement roasted dishes, sauces, soups, and marinades.",
+      },
+      {
+        id: "spring-onions",
+        name: "Spring onions",
+        description:
+          "Fresh, crisp alliums for garnishing, salads, stir-fries, and everyday cooking.",
+      },
+    ],
+    image: "/herbs-2.png",
+    alt: "Fresh culinary herbs and kitchen staples",
+  },
+];
+
+const imageVariants = {
+  enter: (direction: "left" | "right") => ({
+    opacity: 0,
+    x: direction === "left" ? -32 : 32,
+    scale: 0.96,
+  }),
+
+  center: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+  },
+
+  exit: (direction: "left" | "right") => ({
+    opacity: 0,
+    x: direction === "left" ? 32 : -32,
+    scale: 0.98,
+  }),
+};
+
+export default function Products() {
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(
+    null
+  );
+
+  const { addItem, removeItem, items } = useSupplyPlan();
+
+  const prefersReducedMotion = useReducedMotion();
+
+  const planIds = useMemo(
+    () => new Set(items.map((item) => item.id)),
+    [items]
+  );
+
+  const handleProductSelect = (id: string) => {
+    setSelectedProduct((current) => (current === id ? null : id));
   };
 
-  // Individual product cutouts, served from /public/products
-  const PRODUCT_IMAGES: Record<string, string> = {
-    romaine: "/products/romaine_lettuce.png",
-    butterhead: "/products/butterhead_lettuce.png",
-    "green-leaf": "/products/green_leaf_lettuce.png",
-    "red-leaf": "/products/red_leaf_lettuce.png",
-    iceberg: "/products/iceberg_lettuce.png",
+  return (
+    <section
+      id="products"
+      aria-labelledby="products-heading"
+      className="bg-(--surface) py-20 sm:py-28 lg:py-32"
+    >
+      <Container>
+        {/* SECTION INTRO */}
+        <header className="mx-auto max-w-3xl text-center">
+          <span className="mb-5 block text-[10px] font-medium uppercase tracking-[0.18em] text-(--secondary) sm:text-[11px]">
+            Our produce
+          </span>
 
-    kale: "/products/curly_kale.png",
-    spinach: "/products/spinach.png",
-    "swiss-chard": "/products/swiss_chard.png",
-    arugula: "/products/arugula.png",
-    watercress: "/products/watercress.png",
-    "bok-choy": "/products/baby_bok_choy.png",
-    "pak-choi": "/products/pak_choi.png",
+          <h2
+            id="products-heading"
+            className="font-(--font-display) text-[clamp(3rem,7vw,5.25rem)] leading-[0.9] tracking-[-0.055em] text-(--primary)"
+          >
+            Grown for the
+            <br />
+            way you serve.
+          </h2>
 
-    basil: "/products/basil.png",
-    mint: "/products/mint.png",
-    parsley: "/products/fresh_parsley.png",
-    coriander: "/products/coriander_cilantro.png",
+          <p className="mx-auto mt-5 max-w-2xl text-[clamp(0.95rem,1.5vw,1.125rem)] leading-[1.7] text-(--foreground)/60 sm:mt-6">
+            Fresh greens and culinary herbs planned around the needs of
+            restaurants, hospitality, retail, and commercial kitchens.
+          </p>
+        </header>
 
-    dill: "/products/dill.png",
-    chives: "/products/chives.png",
-    oregano: "/products/oregano.png",
-    thyme: "/products/thyme.png",
-    "spring-onions": "/products/spring_onions.png",
-    // "custom-blends" has no individual cutout — panel gracefully omits the image
-  };
+        {/* PLAN STATUS */}
+        <AnimatePresence initial={false}>
+          {items.length > 0 && (
+            <motion.div
+              initial={
+                prefersReducedMotion
+                  ? { opacity: 1, height: "auto" }
+                  : { opacity: 0, height: 0 }
+              }
+              animate={{
+                opacity: 1,
+                height: "auto",
+              }}
+              exit={
+                prefersReducedMotion
+                  ? { opacity: 0 }
+                  : {
+                      opacity: 0,
+                      height: 0,
+                    }
+              }
+              transition={{
+                duration: prefersReducedMotion ? 0 : 0.3,
+              }}
+              className="overflow-hidden"
+            >
+              <div className="mx-auto mt-10 flex max-w-5xl flex-wrap items-center justify-between gap-4 border-y border-(--primary)/10 py-4 sm:mt-12">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary) text-(--primary-foreground)">
+                    <Check size={13} strokeWidth={2.5} />
+                  </span>
 
-  export const productGroups = [
-    {
-      title: "Lettuce varieties",
-      items: [
-        {
-          id: "romaine",
-          name: "Romaine",
-          description:
-            "Crisp, structured leaves that work well in salads, wraps, and sandwiches.",
-        },
-        {
-          id: "butterhead",
-          name: "Butterhead",
-          description:
-            "Tender, soft leaves with a delicate texture for salads and plating.",
-        },
-        {
-          id: "green-leaf",
-          name: "Green leaf",
-          description:
-            "Versatile leafy greens suited to salads, sandwiches, and everyday kitchen use.",
-        },
-        {
-          id: "red-leaf",
-          name: "Red leaf",
-          description:
-            "Vibrant red-tinted leaves that add colour and freshness to salads and dishes.",
-        },
-        {
-          id: "iceberg",
-          name: "Iceberg",
-          description:
-            "Crisp, refreshing leaves that hold up well in high-volume kitchen service.",
-        },
-      ],
-      image: "/lettuce.png",
-      alt: "Crates of freshly harvested lettuce varieties",
-    },
-    {
-      title: "Salad & cooking greens",
-      items: [
-        {
-          id: "kale",
-          name: "Kale",
-          description:
-            "Nutrient-rich leafy greens suited to salads, smoothies, and cooked dishes.",
-        },
-        {
-          id: "spinach",
-          name: "Spinach",
-          description:
-            "Tender, versatile greens for salads, cooking, smoothies, and food preparation.",
-        },
-        {
-          id: "swiss-chard",
-          name: "Swiss chard",
-          description:
-            "Colourful leafy greens with a rich flavour for salads and cooked dishes.",
-        },
-        {
-          id: "arugula",
-          name: "Arugula",
-          description:
-            "Peppery greens that add a distinctive flavour to salads, pizza, and plating.",
-        },
-        {
-          id: "watercress",
-          name: "Watercress",
-          description:
-            "Fresh, peppery leaves ideal for salads, garnishing, and premium dishes.",
-        },
-        {
-          id: "bok-choy",
-          name: "Bok choy",
-          description:
-            "Crisp Asian greens suited to stir-fries, soups, and other cooked dishes.",
-        },
-        {
-          id: "pak-choi",
-          name: "Pak choi",
-          description:
-            "Tender, crisp greens that work especially well in Asian-inspired dishes.",
-        },
-      ],
-      image: "/salad-greens.png",
-      alt: "Bundles of leafy salad and cooking greens",
-    },
-    {
-      title: "Fresh culinary herbs",
-      items: [
-        {
-          id: "basil",
-          name: "Basil",
-          description:
-            "Aromatic fresh herbs for sauces, salads, pasta, garnishing, and drinks.",
-        },
-        {
-          id: "mint",
-          name: "Mint",
-          description:
-            "Fresh, cooling herbs for drinks, desserts, salads, and culinary finishing.",
-        },
-        {
-          id: "parsley",
-          name: "Parsley",
-          description:
-            "Fresh aromatic herbs for seasoning, garnishing, sauces, and everyday cooking.",
-        },
-        {
-          id: "coriander",
-          name: "Coriander",
-          description:
-            "Fragrant herbs that bring freshness to sauces, salads, soups, and finished dishes.",
-        },
-      ],
-      image: "/herbs-1.png",
-      alt: "Fresh culinary herbs bundled for market",
-    },
-    {
-      title: "Kitchen staples",
-      items: [
-        {
-          id: "dill",
-          name: "Dill",
-          description:
-            "Fresh aromatic herbs that pair well with salads, seafood, sauces, and pickles.",
-        },
-        {
-          id: "chives",
-          name: "Chives",
-          description:
-            "Mild onion-flavoured herbs ideal for finishing dishes, sauces, and salads.",
-        },
-        {
-          id: "oregano",
-          name: "Oregano",
-          description:
-            "Aromatic herbs suited to sauces, marinades, pizzas, and Mediterranean dishes.",
-        },
-        {
-          id: "thyme",
-          name: "Thyme",
-          description:
-            "Fragrant herbs that complement roasted dishes, sauces, soups, and marinades.",
-        },
-        {
-          id: "spring-onions",
-          name: "Spring onions",
-          description:
-            "Fresh, crisp alliums for garnishing, salads, stir-fries, and everyday cooking.",
-        },
-        {
-          id: "custom-blends",
-          name: "Custom blends",
-          description:
-            "Tailored combinations planned around your kitchen's requirements and demand.",
-        },
-      ],
-      image: "/herbs-2.png",
-      alt: "Assorted kitchen staple herbs and spring onions",
-    },
-  ];
+                  <span className="text-sm text-(--foreground)/65">
+                    <strong className="font-medium text-(--primary)">
+                      {items.length}
+                    </strong>{" "}
+                    {items.length === 1
+                      ? "item selected"
+                      : "items selected"}
+                  </span>
+                </div>
 
-  export default function Products() {
-    const [selectedProduct, setSelectedProduct] = useState<string | null>(
-      null
-    );
+                {/* Primary: continues the supply-planning flow */}
+                <Button href="#supply-planner" variant="primary">
+                  <p className="text-primary-foreground">Continue to supply planner</p>
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-    const { addItem, items } = useSupplyPlan();
+        {/* PRODUCT SHOWCASE */}
+        <div className="mt-16 sm:mt-20">
+          {productGroups.map((group, index) => {
+            const isImageLeft = index % 2 === 0;
 
-    const handleProductSelect = (productId: string) => {
-      setSelectedProduct((current) =>
-        current === productId ? null : productId
-      );
-    };
+            const selectedItem = group.items.find(
+              (item) => item.id === selectedProduct
+            );
 
-    const isProductInPlan = (productId: string) => {
-      return items.some((item) => item.id === productId);
-    };
+            const displayedImage = selectedItem
+              ? PRODUCT_IMAGES[selectedItem.id]
+              : group.image;
 
-    return (
-      <section
-        id="products"
-        className="bg-(--surface) px-6 py-24 sm:py-32"
-      >
+            const isCustomBlend =
+              selectedItem?.id === "custom-blends";
 
-        <Container>
-          {/* Section heading */}
-          <div className="grid gap-8 md:grid-cols-[1fr_0.8fr] md:items-end">
-            <div>
-              <span className="mb-5 inline-block text-[11px] font-medium uppercase tracking-[0.16em] text-(--secondary)">
-                Our produce
-              </span>
-
-              <h2 className="font-(--font-display) text-4xl leading-none tracking-tighter text-(--primary) sm:text-5xl md:text-6xl">
-                What we grow
-              </h2>
-            </div>
-
-            <p className="max-w-xl text-base leading-relaxed text-(--foreground)/65 md:text-lg">
-              A living catalog, planted around what your kitchen actually
-              orders.
-            </p>
-          </div>
-
-          {/* Product catalog */}
-          <div className="mt-16">
-            {productGroups.map(
-              ({ title, items, image, alt }, index) => {
-                // Direction mirrors this row's main image position:
-                // even rows show the catalog image on the left, so the
-                // individual product image slides in from the left too.
-                const revealDirection =
-                  index % 2 === 0 ? "left" : "right";
-
-                // If the selected product belongs to this group, swap the
-                // big catalog photo for that product's own cutout.
-                const selectedItemInGroup = items.find(
-                  (item) => item.id === selectedProduct
-                );
-                const activeImage = selectedItemInGroup
-                  ? PRODUCT_IMAGES[selectedItemInGroup.id]
-                  : undefined;
-
-                const displayedSrc = activeImage ?? image;
-                const displayedAlt = selectedItemInGroup
-                  ? selectedItemInGroup.name
-                  : alt;
-
-                return (
-                  <article
-                    key={title}
-                    className="group grid gap-8 border-t border-(--primary)/15 py-10 md:grid-cols-2 md:items-center md:gap-16 md:py-16"
+            return (
+              <article
+                key={group.title}
+                className="grid gap-8 border-t border-(--primary)/12 py-12 sm:gap-10 sm:py-16 md:grid-cols-[1.08fr_0.92fr] md:gap-20 md:py-20"
+              >
+                {/* IMAGE */}
+                <div
+                  className={`relative flex min-h-70 min-w-0 items-center justify-center sm:min-h-85 md:min-h-110 ${
+                    isImageLeft ? "md:order-1" : "md:order-2"
+                  }`}
+                >
+                  <AnimatePresence
+                    initial={false}
+                    mode="sync"
+                    custom={isImageLeft ? "left" : "right"}
                   >
-                    {/* Image */}
-                    <div
-                      className={`relative aspect-520/340 overflow-hidden rounded-[20px] ${
-                        index % 2 !== 0 ? "md:order-2" : "md:order-1"
-                      }`}
-                    >
-                      <AnimatePresence initial={false} custom={revealDirection}>
-                        <motion.div
-                          key={displayedSrc}
-                          custom={revealDirection}
-                          variants={imageVariants}
-                          initial="enter"
-                          animate="center"
-                          exit="exit"
-                          transition={{
-                            x: { type: "spring", stiffness: 220, damping: 22 },
-                            scale: { type: "spring", stiffness: 220, damping: 22 },
-                            opacity: { duration: 0.35 },
-                            filter: { duration: 0.35 },
-                          }}
-                          className="absolute inset-0"
-                        >
-                          <Image
-                            src={displayedSrc}
-                            alt={displayedAlt}
-                            fill
-                            sizes="(min-width: 768px) 50vw, 100vw"
-                            className="bg-(--surface) object-contain p-6 transition-transform duration-700 ease-out group-hover:scale-[1.025] sm:p-10"
-                          />
-                        </motion.div>
-                      </AnimatePresence>
-                    </div>
-
-                    {/* Content */}
-                    <div
-                      className={
-                        index % 2 !== 0
-                          ? "min-w-0 md:order-1"
-                          : "min-w-0 md:order-2"
+                    <motion.div
+                      key={displayedImage}
+                      custom={isImageLeft ? "left" : "right"}
+                      variants={imageVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={
+                        prefersReducedMotion
+                          ? { duration: 0 }
+                          : {
+                              x: {
+                                type: "spring",
+                                stiffness: 240,
+                                damping: 26,
+                              },
+                              scale: {
+                                type: "spring",
+                                stiffness: 240,
+                                damping: 26,
+                              },
+                              opacity: {
+                                duration: 0.3,
+                              },
+                            }
                       }
+                      className="absolute inset-0"
                     >
-                      <h3 className="max-w-lg  text-3xl font-medium leading-tight tracking-[-0.03em] text-(--primary) sm:text-4xl">
-                        {title}
-                      </h3>
+                      <Image
+                        src={displayedImage}
+                        alt={
+                          selectedItem
+                            ? `Fresh ${selectedItem.name}`
+                            : group.alt
+                        }
+                        fill
+                        sizes="(min-width: 768px) 55vw, 100vw"
+                        className={`object-contain transition-transform duration-700 ease-out hover:scale-[1.025] ${
+                          isCustomBlend
+                            ? "p-12 sm:p-16"
+                            : "p-0 sm:p-2"
+                        }`}
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
 
-                      <div className="mt-7 max-w-xl border-t border-(--primary)/15 pt-5">
-                        {/* Products */}
-                        <div className="flex min-w-0 max-w-full flex-nowrap gap-2 overflow-x-auto pb-2 scrollbar-none md:flex-wrap md:overflow-visible md:pb-0">
-                          {items.map((item) => {
-                            const isSelected =
-                              selectedProduct === item.id;
+                {/* CONTENT */}
+                <div
+                  className={`min-w-0 flex flex-col justify-center ${
+                    isImageLeft ? "md:order-2" : "md:order-1"
+                  }`}
+                >
+                  <h3 className="max-w-xl font-(--font-display) text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.95] tracking-[-0.045em] text-(--primary)">
+                    {group.title}
+                  </h3>
 
-                            const isInPlan =
-                              isProductInPlan(item.id);
+                  <p className="mt-4 max-w-md text-[clamp(0.875rem,1.2vw,1rem)] leading-[1.7] text-(--foreground)/55 sm:mt-5">
+                    {index === 0 &&
+                      "Reliable varieties for salads, sandwiches, plating, and everyday kitchen service."}
 
-                            return (
-                              <button
-                                key={item.id}
-                                type="button"
-                                onClick={() =>
-                                  handleProductSelect(item.id)
-                                }
-                                aria-pressed={isSelected}
-                                aria-label={`Select ${item.name}`}
-                                className={`group/item inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm transition-[background-color,border-color,color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 md:shrink ${
-                                  isSelected
-                                    ? "border-(--primary) bg-(--primary) text-white"
-                                    : isInPlan
-                                      ? "border-(--primary)/25 bg-(--primary)/5 text-(--primary)"
-                                      : "border-(--primary)/10 bg-transparent text-(--foreground)/70 hover:-translate-y-0.5 hover:border-(--primary)/30 hover:text-(--primary)"
-                                }`}
-                              >
-                                {isInPlan && (
-                                  <Check
-                                    size={14}
-                                    strokeWidth={2.5}
-                                    aria-hidden="true"
-                                  />
-                                )}
+                    {index === 1 &&
+                      "Versatile greens for fresh dishes, cooking, garnishing, and high-volume preparation."}
 
-                                {item.name}
-                              </button>
-                            );
-                          })}
-                        </div>
+                    {index === 2 &&
+                      "Aromatic herbs that bring freshness and finishing detail to food and drinks."}
 
-                        {/* Selected product details */}
-                        {items.map((item) => {
-                          if (selectedProduct !== item.id) {
-                            return null;
-                          }
-                        
-                          const isInPlan = isProductInPlan(item.id);
-                        
+                    {index === 3 &&
+                      "Essential herbs and alliums for sauces, seasoning, finishing, and everyday kitchen use."}
+                  </p>
+
+                  {/* PRODUCT SELECTOR */}
+                  <div className="mt-7 min-w-0 max-w-full sm:mt-9">
+                    <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.16em] text-(--foreground)/35">
+                      Select produce
+                    </p>
+
+                    <div className="max-w-full overflow-x-auto overscroll-x-contain pb-2">
+                      <div className="flex w-max gap-2">
+                        {group.items.map((item) => {
+                          const isSelected =
+                            selectedProduct === item.id;
+
+                          const isInPlan = planIds.has(item.id);
+
                           return (
-                            <div
-                              key={`${item.id}-details`}
-                              className="mt-5 rounded-2xl border border-(--primary)/10 bg-(--background)/50 p-5"
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() =>
+                                handleProductSelect(item.id)
+                              }
+                              aria-pressed={isSelected}
+                              className={`group inline-flex shrink-0 items-center gap-2 border px-3.5 py-2 text-sm font-medium transition-[background-color,border-color,color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
+                                isSelected
+                                  ? "border-(--primary) bg-(--primary) text-(--primary-foreground)"
+                                  : "border-(--primary)/12 bg-(--background) text-(--foreground)/65 hover:border-(--primary)/30 hover:bg-(--surface) hover:text-(--primary)"
+                              }`}
                             >
-                              {/* Product identity */}
-                              <div>
-                                <p className="text-xs font-medium uppercase tracking-wider text-(--foreground)/45">
-          Selected produce
-                                </p>
-                          
-                                <h3 className="mt-1 text-lg font-semibold text-(--foreground)">
-                                  {item.name}
-                                </h3>
-                              </div>
-                          
-                              {/* Product description */}
-                              <p className="mt-3 max-w-lg text-sm leading-relaxed text-(--foreground)/65">
-                                {item.description}
-                              </p>
-                          
-                              {/* Actions */}
-                              <div className="mt-5 flex flex-wrap items-center gap-4">
-                                <button
-                                  type="button"
-                                  disabled={isInPlan}
-                                  onClick={() => {
-                                    addItem({
-                                      id: item.id,
-                                      name: item.name,
-                                      unit: "kg",
-                                    });
-                                  }}
-                                  className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-[transform,opacity,background-color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
-                                    isInPlan
-                                      ? "cursor-default bg-(--primary)/10 text-(--primary)"
-                                      : "bg-(--primary) text-white hover:-translate-y-0.5 hover:opacity-90"
-                                  }`}
-                                >
-                                  {isInPlan ? (
-                                    <>
-                                      <Check
-                                        size={15}
-                                        strokeWidth={2.5}
-                                        aria-hidden="true"
-                                      />
-                                      Added to supply plan
-                                    </>
-                                  ) : (
-                                    "Add to supply plan"
-                                  )}
-                                </button>
-                                
-                                {/* Only show after the product has been added */}
-                                {isInPlan && (
-                                  <a
-                                    href="#supply-planner"
-                                    className="inline-flex items-center gap-1 text-sm font-medium text-(--foreground)/60 underline-offset-4 transition-colors hover:text-(--primary) hover:underline"
-                                  >
-                                    Review supply plan
-                                    <span aria-hidden="true">→</span>
-                                  </a>
-                                )}
-                              </div>
-                            </div>
+                              {isInPlan && (
+                                <Check
+                                  size={13}
+                                  strokeWidth={2.5}
+                                  aria-hidden="true"
+                                />
+                              )}
+
+                              <span>{item.name}</span>
+
+                              {!isInPlan && (
+                                <Plus
+                                  size={13}
+                                  className="opacity-40 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:opacity-70"
+                                  aria-hidden="true"
+                                />
+                              )}
+                            </button>
                           );
                         })}
                       </div>
                     </div>
-                  </article>
-                );
-              }
-            )}
-          </div>
+                  </div>
 
-          {/* Closing line */}
-          <div className="border-t border-(--primary)/15 py-10">
-            <p className="text-sm text-(--foreground)/60">
-              From everyday staples to custom crop plans.
-            </p>
+                  {/* SELECTED PRODUCT */}
+                  <AnimatePresence initial={false} mode="wait">
+                    {selectedItem && (
+                      <motion.div
+                        key={selectedItem.id}
+                        initial={
+                          prefersReducedMotion
+                            ? { opacity: 1, y: 0 }
+                            : { opacity: 0, y: 8 }
+                        }
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                        }}
+                        exit={
+                          prefersReducedMotion
+                            ? { opacity: 0 }
+                            : {
+                                opacity: 0,
+                                y: -5,
+                              }
+                        }
+                        transition={{
+                          duration: prefersReducedMotion ? 0 : 0.24,
+                        }}
+                        className="mt-7 border-l-2 border-(--accent) pl-4 sm:mt-8 sm:pl-5"
+                      >
+                        <div className="flex items-start justify-between gap-5 sm:gap-6">
+                          <div>
+                            <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-(--foreground)/35">
+                              Selected
+                            </span>
+
+                            <h4 className="mt-1 text-[clamp(1.125rem,2vw,1.25rem)] font-medium tracking-tight text-(--primary)">
+                              {selectedItem.name}
+                            </h4>
+                          </div>
+
+                          {planIds.has(selectedItem.id) && (
+                            <span className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-(--secondary)">
+                              <Check
+                                size={14}
+                                strokeWidth={2.5}
+                              />
+                              In plan
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="mt-3 max-w-md text-[clamp(0.875rem,1.2vw,1rem)] leading-[1.7] text-(--foreground)/60">
+                          {selectedItem.description}
+                        </p>
+
+                        <div className="mt-5">
+                          {planIds.has(selectedItem.id) ? (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeItem(selectedItem.id)
+                              }
+                              className="text-sm font-medium text-(--foreground)/50 underline decoration-(--foreground)/20 underline-offset-4 transition-colors hover:text-(--primary) hover:decoration-(--primary)/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-4"
+                            >
+                              Remove from supply plan
+                            </button>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="primary"
+                              onClick={() =>
+                                addItem({
+                                  id: selectedItem.id,
+                                  name: selectedItem.name,
+                                  unit: "kg",
+                                })
+                              }
+                            >
+                              Add to supply plan
+                              <ArrowUpRight size={15} />
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {/* FINAL CTA */}
+        <div className="border-t border-(--primary)/12 pt-7 sm:pt-8">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-(--font-display) text-[clamp(1.5rem,3vw,2rem)] tracking-[-0.03em] text-(--primary)">
+                Need something specific?
+              </p>
+
+              <p className="mt-1 text-sm leading-[1.6] text-(--foreground)/55">
+                We can plan around your kitchen&apos;s requirements.
+              </p>
+            </div>
+
+            <Button href="#supply-planner" variant="primary">
+              <p className="text-primary-foreground">Plan your supply</p>
+            </Button>
           </div>
-        </Container>
-      </section>
-    );
-  }
+        </div>
+      </Container>
+    </section>
+  );
+}
+

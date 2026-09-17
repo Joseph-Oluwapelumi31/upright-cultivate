@@ -59,7 +59,7 @@ export default function Navbar() {
         <Link
           href="#"
           aria-label="Upright Cultivate home"
-          className="flex items-center gap-2.5 rounded-full border border-white/30 bg-white/55 p-4 md:px-4 md:py-2.5 text-xl font-medium text-primary backdrop-blur-xl transition-colors duration-200 hover:bg-white/70"
+          className="flex items-center gap-2.5 rounded-full border border-white/30 bg-background p-4 md:px-4 md:py-2.5 text-xl font-medium text-primary transition-colors duration-200 hover:bg-white/70"
         >
           <Image
             src="/logo.png"
@@ -75,7 +75,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop navigation + CTA */}
-        <div className="flex items-center gap-2 rounded-full bg-surface/90 px-2 py-2 shadow-sm backdrop-blur-sm ">
+        <div className="flex items-center gap-2 rounded-full bg-surface/90 px-2 py-2 shadow-sm ">
           <nav
             className="flex items-center gap-1"
             aria-label="Main navigation"
@@ -84,7 +84,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full px-4 py-2.5 text-[13px] text-primary opacity-80 transition-colors duration-200 hover:bg-surface hover:opacity-100"
+                className="rounded-full px-4 py-2.5 text-primary transition-colors duration-200 hover:bg-surface hover:opacity-100"
               >
                 {link.label}
               </Link>
@@ -94,9 +94,8 @@ export default function Navbar() {
           <Button
             href="#supply-planner"
             variant="primary"
-            className="min-h-11 px-5 py-2.5 text-[13px]"
           >
-            Request supply plan
+            <p className="text-primary-foreground">Request supply plan</p>
           </Button>
         </div>
 

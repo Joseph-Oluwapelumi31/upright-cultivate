@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useReducedMotion } from "motion/react";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 
@@ -10,84 +8,37 @@ const steps = [
     number: "01",
     title: "Tell us what you need",
     text: "Share the produce, volume and delivery rhythm your business requires.",
+    background: "bg-(--surface)",
+    rotation: "-rotate-[1.5deg]",
   },
   {
     number: "02",
     title: "We plan your crop",
     text: "We align production with your expected demand.",
+    background: "bg-[#e9eee3]",
+    rotation: "rotate-[1deg]",
   },
   {
     number: "03",
     title: "We grow & harvest",
     text: "Your produce is grown in a controlled environment and harvested for delivery.",
+    background: "bg-[#e8e4d5]",
+    rotation: "-rotate-[0.8deg]",
   },
   {
     number: "04",
     title: "We deliver fresh",
     text: "Your order moves from our growing operation to your business.",
+    background: "bg-(--accent)",
+    rotation: "rotate-[1.3deg]",
   },
 ];
 
 export default function HowItWorks() {
-  const cardsRef = useRef<(HTMLElement | null)[]>([]);
-  const prefersReducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (prefersReducedMotion) return;
-
-    let ticking = false;
-
-    const update = () => {
-      const cards = cardsRef.current;
-
-      cards.forEach((card, index) => {
-        if (!card || index === cards.length - 1) return;
-
-        const nextCard = cards[index + 1];
-
-        if (!nextCard) return;
-
-        const nextRect = nextCard.getBoundingClientRect();
-
-        const start = window.innerHeight * 0.72;
-        const end = window.innerHeight * 0.28;
-
-        const progress = Math.min(
-          Math.max((start - nextRect.top) / (start - end), 0),
-          1
-        );
-
-        const opacity = 1 - progress * 0.65;
-        const scale = 1 - progress * 0.035;
-
-        card.style.opacity = `${opacity}`;
-        card.style.transform = `scale(${scale})`;
-      });
-
-      ticking = false;
-    };
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(update);
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    });
-
-    update();
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [prefersReducedMotion]);
-
   return (
     <section
       id="how-it-works"
+      aria-labelledby="how-it-works-heading"
       className="bg-(--background) py-24 sm:py-32"
     >
       <Container>
@@ -96,43 +47,46 @@ export default function HowItWorks() {
           title="A simpler route from growing to your kitchen."
         />
 
-        <div className="mt-16 grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="mt-16 grid gap-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           {/* Left side */}
           <div className="lg:sticky lg:top-32 lg:self-start">
-            <p className="max-w-sm text-base leading-relaxed text-(--foreground)/65">
+            <p className="max-w-sm text-base leading-relaxed text-(--foreground)/65 md:text-lg">
               From planning your supply to delivering fresh produce, every
               step is built around your business.
             </p>
           </div>
 
-          {/* Card stack */}
+          {/* Stacking cards */}
           <div className="relative">
             {steps.map((step, index) => (
               <article
                 key={step.number}
-                ref={(el) => {
-                  cardsRef.current[index] = el;
-                }}
-                className="sticky top-32 mb-6 min-h-105 rounded-4xl bg-(--surface) p-8 ring-1 ring-(--primary)/10 will-change-transform sm:p-12"
+                className={`sticky top-32 ${step.background} ${step.rotation} relative -mb-12 min-h-105 rounded-[2rem] p-8 shadow-[0_16px_50px_rgba(16,61,38,0.08)] ring-1 ring-(--primary)/10 sm:min-h-115 sm:p-12`}
                 style={{
                   zIndex: index + 1,
                 }}
               >
                 {/* Step number */}
-                <span className="text-sm font-medium tracking-[0.08em] text-(--highlight)">
+                <span className="text-sm font-medium tracking-[0.1em] text-(--primary)/45">
                   {step.number}
                 </span>
 
                 {/* Content */}
-                <div className="mt-20 max-w-xl">
-                  <h3 className="font-display text-2xl font-medium leading-tight tracking-tight text-(--primary) sm:text-4xl">
+                <div className="mt-20 max-w-xl sm:mt-24">
+                  <h3 className="font-display text-3xl font-medium leading-[1.05] tracking-tight text-(--primary) sm:text-5xl">
                     {step.title}
                   </h3>
 
-                  <p className="mt-4 max-w-md text-sm leading-6 text-(--foreground)/65 sm:text-base">
+                  <p className="mt-5 max-w-md text-sm leading-relaxed text-(--foreground)/65 sm:text-base">
                     {step.text}
                   </p>
                 </div>
+
+                {/* Decorative corner detail */}
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-8 right-8 h-3 w-3 rounded-full bg-(--primary)/15 sm:bottom-12 sm:right-12"
+                />
               </article>
             ))}
           </div>

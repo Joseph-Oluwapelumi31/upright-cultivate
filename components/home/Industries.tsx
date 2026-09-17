@@ -28,7 +28,7 @@ export default function Industries() {
   return (
     <section
       id="industries"
-      className="bg-(--background) px-6 py-20 sm:py-24 md:py-28"
+      className="bg-(--background)  py-20 sm:py-24 md:py-28"
     >
       <Container>
         {/* Section heading */}

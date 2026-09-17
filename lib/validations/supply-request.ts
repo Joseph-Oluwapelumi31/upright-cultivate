@@ -66,7 +66,7 @@ export const supplyRequestSchema = z.object({
   phone: z
     .string()
     .trim()
-    .min(7, "Please enter a valid phone number.")
+    .min(11, "Please enter a valid phone number.")
     .max(30, "Phone number is too long."),
 
   deliveryLocation: z
