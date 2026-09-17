@@ -5,18 +5,11 @@ import Solution from "@/components/home/Solution";
 import HowItWorks from "@/components/home/HowItWorks";
 import Products from "@/components/home/Products";
 import Industries from "@/components/home/Industries";
-import SupplyPlanner from "@/components/home/SupplyPlanner";
 import FinalCTA from "@/components/home/FinalCTA";
-import Footer from "@/components/layout/Footer";
-import Navbar from "@/components/layout/Navbar";
-import MobileNav from "@/components/layout/MobileNav";
-import { SupplyPlanProvider } from "@/components/supply-plan/SupplyPlanProvider";
 
 export default function Home() {
   return (
-    <SupplyPlanProvider>
-      <Navbar />
-      <MobileNav />
+      
       <main>
         <Hero />
         <TrustBar />
@@ -25,11 +18,7 @@ export default function Home() {
         <HowItWorks />
         <Products />
         <Industries />
-        <SupplyPlanner />
         <FinalCTA />
       </main>
-
-      <Footer />
-    </SupplyPlanProvider>
   );
 }

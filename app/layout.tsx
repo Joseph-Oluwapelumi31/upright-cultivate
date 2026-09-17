@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Poppins } from "next/font/google";
+import Navbar from "@/components/layout/Navbar";
+import MobileNav from "@/components/layout/MobileNav";
+import Footer from "@/components/layout/Footer";
+
 import "./globals.css";
+import { SupplyPlanProvider } from "@/components/supply-plan/SupplyPlanProvider";
 
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -51,7 +56,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${bricolage.variable} ${poppins.variable}`}>
-        {children}
+        <SupplyPlanProvider>
+          <Navbar />
+          <MobileNav />
+          {children}
+          <Footer />
+        </SupplyPlanProvider>
       </body>
     </html>
   );

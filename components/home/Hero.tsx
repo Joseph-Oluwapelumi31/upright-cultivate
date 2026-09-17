@@ -76,7 +76,7 @@ export default function Hero() {
               <div className="mt-9 flex flex-wrap items-center gap-3">
                 {/* Primary CTA */}
                 <Button 
-                  href="#supply-planner"
+                  href="/supply"
                   variant="accent"
                 >
                   <p className="text-accent-foreground">Request a supply plan</p>

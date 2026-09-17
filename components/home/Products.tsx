@@ -318,7 +318,7 @@ export default function Products() {
                 </div>
 
                 {/* Primary: continues the supply-planning flow */}
-                <Button href="#supply-planner" variant="primary">
+                <Button href="/supply" variant="primary">
                   <p className="text-primary-foreground">Continue to supply planner</p>
                 </Button>
               </div>
@@ -584,7 +584,7 @@ export default function Products() {
               </p>
             </div>
 
-            <Button href="#supply-planner" variant="primary">
+            <Button href="/supply" variant="primary">
               <p className="text-primary-foreground">Plan your supply</p>
             </Button>
           </div>
