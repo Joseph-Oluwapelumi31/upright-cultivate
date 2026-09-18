@@ -84,7 +84,7 @@ export default function Hero() {
                 </Button>
 
                 {/* Secondary CTA */}
-                <Button href="#products" variant="secondary">
+                <Button href="/#products" variant="secondary">
                   <p className="text-secondary-foreground">Explore produce</p>
                 </Button>
                 

@@ -69,7 +69,7 @@ export default function FinalCTA() {
           </p>
 
           <div className="mt-8">
-            <Button href="#supply-planner" variant="primary">
+            <Button href="/supply" variant="primary">
              <p className="text-primary-foreground">Start your supply plan</p> 
             </Button>
           </div>

@@ -66,7 +66,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="bg-background py-24 sm:py-32">
+    <section className="bg-background py-24 sm:py-32" id="faq">
       <Container>
         <div className="mx-auto w-full max-w-4xl">
           {/* Heading */}
