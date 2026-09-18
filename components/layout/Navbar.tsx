@@ -7,9 +7,9 @@ import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 
 const navLinks = [
-  { label: "Why us", href: "#why" },
-  { label: "Products", href: "#products" },
-  { label: "Industries", href: "#industries" },
+  { label: "Why us", href: "/#why" },
+  { label: "Products", href: "/#products" },
+  { label: "Industries", href: "/#industries" },
 ];
 
 export default function Navbar() {
@@ -92,7 +92,7 @@ export default function Navbar() {
           </nav>
 
           <Button
-            href="#supply-planner"
+            href="/supply"
             variant="primary"
           >
             <p className="text-primary-foreground">Request supply plan</p>

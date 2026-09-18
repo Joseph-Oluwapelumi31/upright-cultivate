@@ -9,9 +9,9 @@ import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 
 const navLinks = [
-  { label: "Why us", href: "#why" },
-  { label: "Products", href: "#products" },
-  { label: "Industries", href: "#industries" },
+  { label: "Why us", href: "/#why" },
+  { label: "Products", href: "/#products" },
+  { label: "Industries", href: "/#industries" },
 ];
 
 export default function MobileNav() {
