@@ -324,3 +324,13 @@ a {
   background: var(--accent);
   color: var(--accent-foreground);
 }
+
+/* globals.css */
+
+.scrollbar-hidden {
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}

@@ -57,9 +57,9 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           {/* Logo */}
         <Link
-          href="#"
+          href="/"
           aria-label="Upright Cultivate home"
-          className="flex items-center gap-2.5 rounded-full border border-white/30 bg-background p-4 md:px-4 md:py-2.5 text-xl font-medium text-primary transition-colors duration-200 hover:bg-white/70"
+          className="flex items-center gap-2 rounded-full bg-surface/90 px-6 py-4 shadow-sm"
         >
           <Image
             src="/logo.png"
@@ -84,7 +84,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full px-4 py-2.5 text-primary transition-colors duration-200 hover:bg-surface hover:opacity-100"
+                className="rounded-full px-4 py-2 text-primary transition-colors duration-200 hover:bg-surface hover:opacity-100"
               >
                 {link.label}
               </Link>

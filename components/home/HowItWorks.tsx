@@ -61,13 +61,13 @@ export default function HowItWorks() {
             {steps.map((step, index) => (
               <article
                 key={step.number}
-                className={`sticky top-32 ${step.background} ${step.rotation} relative -mb-12 min-h-105 rounded-[2rem] p-8 shadow-[0_16px_50px_rgba(16,61,38,0.08)] ring-1 ring-(--primary)/10 sm:min-h-115 sm:p-12`}
+                className={`sticky top-32 ${step.background} ${step.rotation} relative -mb-12 min-h-105 rounded-4xl p-8 shadow-[0_16px_50px_rgba(16,61,38,0.08)] ring-1 ring-(--primary)/10 sm:min-h-115 sm:p-12`}
                 style={{
                   zIndex: index + 1,
                 }}
               >
                 {/* Step number */}
-                <span className="text-sm font-medium tracking-[0.1em] text-(--primary)/45">
+                <span className="text-sm font-medium tracking-widest text-primary/45">
                   {step.number}
                 </span>
 

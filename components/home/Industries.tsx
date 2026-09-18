@@ -60,7 +60,7 @@ export default function Industries() {
               transition={{
                 duration: 0.8,
                 delay: prefersReducedMotion ? 0 : index * 0.14,
-                ease: [0.22, 1, 0.36, 1],
+                ease: "easeOut",
               }}
               style={{
                 transformOrigin: "top center",

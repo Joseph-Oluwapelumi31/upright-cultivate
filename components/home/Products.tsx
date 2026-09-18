@@ -17,6 +17,7 @@ interface Product {
 
 interface ProductGroup {
   title: string;
+  description: string;
   items: Product[];
   image: string;
   alt: string;
@@ -52,6 +53,8 @@ const PRODUCT_IMAGES: Record<string, string> = {
 export const productGroups: ProductGroup[] = [
   {
     title: "Lettuce varieties",
+    description:
+      "Reliable varieties for salads, sandwiches, plating, and everyday kitchen service.",
     items: [
       {
         id: "romaine",
@@ -90,6 +93,8 @@ export const productGroups: ProductGroup[] = [
 
   {
     title: "Salad & cooking greens",
+    description:
+      "Versatile greens for fresh dishes, cooking, garnishing, and high-volume preparation.",
     items: [
       {
         id: "kale",
@@ -140,6 +145,8 @@ export const productGroups: ProductGroup[] = [
 
   {
     title: "Fresh culinary herbs",
+    description:
+      "Aromatic herbs that bring freshness and finishing detail to food and drinks.",
     items: [
       {
         id: "basil",
@@ -172,6 +179,8 @@ export const productGroups: ProductGroup[] = [
 
   {
     title: "Kitchen staples",
+    description:
+      "Essential herbs and alliums for sauces, seasoning, finishing, and everyday kitchen use.",
     items: [
       {
         id: "dill",
@@ -233,6 +242,7 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(
     null
   );
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
 
   const { addItem, removeItem, items } = useSupplyPlan();
 
@@ -245,6 +255,10 @@ export default function Products() {
 
   const handleProductSelect = (id: string) => {
     setSelectedProduct((current) => (current === id ? null : id));
+  };
+
+  const markImageBroken = (src: string) => {
+    setBrokenImages((current) => new Set(current).add(src));
   };
 
   return (
@@ -301,7 +315,7 @@ export default function Products() {
               }}
               className="overflow-hidden"
             >
-              <div className="mx-auto mt-10 flex max-w-5xl flex-wrap items-center justify-between gap-4 border-y border-(--primary)/10 py-4 sm:mt-12">
+              <div className="mx-auto mt-10 flex max-w-5xl flex-wrap items-center justify-between gap-4 rounded-2xl bg-(--background) px-5 py-4 shadow-sm ring-1 ring-(--primary)/8 sm:mt-12">
                 <div className="flex items-center gap-3">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary) text-(--primary-foreground)">
                     <Check size={13} strokeWidth={2.5} />
@@ -335,12 +349,16 @@ export default function Products() {
               (item) => item.id === selectedProduct
             );
 
-            const displayedImage = selectedItem
+            // Fall back to the group hero image if a product has no
+            // dedicated image mapped, or if that image failed to load.
+            const rawImage = selectedItem
               ? PRODUCT_IMAGES[selectedItem.id]
               : group.image;
 
-            const isCustomBlend =
-              selectedItem?.id === "custom-blends";
+            const displayedImage =
+              rawImage && !brokenImages.has(rawImage)
+                ? rawImage
+                : group.image;
 
             return (
               <article
@@ -349,7 +367,7 @@ export default function Products() {
               >
                 {/* IMAGE */}
                 <div
-                  className={`relative flex min-h-70 min-w-0 items-center justify-center sm:min-h-85 md:min-h-110 ${
+                  className={`relative flex min-h-70 min-w-0 items-center justify-center overflow-hidden rounded-3xl bg-(--background) sm:min-h-85 md:min-h-110 ${
                     isImageLeft ? "md:order-1" : "md:order-2"
                   }`}
                 >
@@ -395,11 +413,8 @@ export default function Products() {
                         }
                         fill
                         sizes="(min-width: 768px) 55vw, 100vw"
-                        className={`object-contain transition-transform duration-700 ease-out hover:scale-[1.025] ${
-                          isCustomBlend
-                            ? "p-12 sm:p-16"
-                            : "p-0 sm:p-2"
-                        }`}
+                        onError={() => markImageBroken(displayedImage)}
+                        className="object-contain p-2 transition-transform duration-700 ease-out hover:scale-[1.025] sm:p-4"
                       />
                     </motion.div>
                   </AnimatePresence>
@@ -416,17 +431,7 @@ export default function Products() {
                   </h3>
 
                   <p className="mt-4 max-w-md text-[clamp(0.875rem,1.2vw,1rem)] leading-[1.7] text-(--foreground)/55 sm:mt-5">
-                    {index === 0 &&
-                      "Reliable varieties for salads, sandwiches, plating, and everyday kitchen service."}
-
-                    {index === 1 &&
-                      "Versatile greens for fresh dishes, cooking, garnishing, and high-volume preparation."}
-
-                    {index === 2 &&
-                      "Aromatic herbs that bring freshness and finishing detail to food and drinks."}
-
-                    {index === 3 &&
-                      "Essential herbs and alliums for sauces, seasoning, finishing, and everyday kitchen use."}
+                    {group.description}
                   </p>
 
                   {/* PRODUCT SELECTOR */}
@@ -451,10 +456,10 @@ export default function Products() {
                                 handleProductSelect(item.id)
                               }
                               aria-pressed={isSelected}
-                              className={`group inline-flex shrink-0 items-center gap-2 border px-3.5 py-2 text-sm font-medium transition-[background-color,border-color,color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
+                              className={`group inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-offset-2 ${
                                 isSelected
-                                  ? "border-(--primary) bg-(--primary) text-(--primary-foreground)"
-                                  : "border-(--primary)/12 bg-(--background) text-(--foreground)/65 hover:border-(--primary)/30 hover:bg-(--surface) hover:text-(--primary)"
+                                  ? "border-(--primary) bg-(--primary) text-(--primary-foreground) shadow-sm shadow-(--primary)/20"
+                                  : "border-(--primary)/12 bg-(--background) text-(--foreground)/65 hover:border-(--primary)/30 hover:bg-(--background) hover:text-(--primary) hover:shadow-sm"
                               }`}
                             >
                               {isInPlan && (
@@ -482,6 +487,9 @@ export default function Products() {
                   </div>
 
                   {/* SELECTED PRODUCT */}
+                  {/* mode="wait" here (vs. "sync" on the image) is intentional:
+                      the panel's content fully exits before the next product's
+                      details enter, avoiding two descriptions overlapping. */}
                   <AnimatePresence initial={false} mode="wait">
                     {selectedItem && (
                       <motion.div
@@ -506,7 +514,7 @@ export default function Products() {
                         transition={{
                           duration: prefersReducedMotion ? 0 : 0.24,
                         }}
-                        className="mt-7 border-l-2 border-(--accent) pl-4 sm:mt-8 sm:pl-5"
+                        className="mt-7 rounded-2xl bg-(--background) p-5 shadow-sm ring-1 ring-(--primary)/8 sm:mt-8 sm:p-6"
                       >
                         <div className="flex items-start justify-between gap-5 sm:gap-6">
                           <div>
@@ -520,7 +528,7 @@ export default function Products() {
                           </div>
 
                           {planIds.has(selectedItem.id) && (
-                            <span className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-(--secondary)">
+                            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-(--secondary)/10 px-2.5 py-1 text-xs font-medium text-(--secondary)">
                               <Check
                                 size={14}
                                 strokeWidth={2.5}
@@ -572,7 +580,7 @@ export default function Products() {
         </div>
 
         {/* FINAL CTA */}
-        <div className="border-t border-(--primary)/12 pt-7 sm:pt-8">
+        <div className="rounded-2xl bg-(--background) px-6 py-7 shadow-sm ring-1 ring-(--primary)/8 sm:px-8 sm:py-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-(--font-display) text-[clamp(1.5rem,3vw,2rem)] tracking-[-0.03em] text-(--primary)">
@@ -593,4 +601,3 @@ export default function Products() {
     </section>
   );
 }
-

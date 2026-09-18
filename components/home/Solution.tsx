@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { Reveal, imageReveal, stagger, itemReveal } from "@/components/ui/Reveal";
+import Button from "../ui/Button";
 
 interface ValuePoint {
   icon: LucideIcon;
@@ -183,17 +184,19 @@ export default function Solution() {
 
             <Reveal delay={0.2} amount={0.3}>
               <div className="mt-8">
+                <Button
+                  href="/supply"
+                  variant="primary"
+                >
+                  <p className="text-primary-foreground">Plan your supply</p>
+
+                  
+                </Button>
                 <Link
                   href="#supply-planner"
                   className="group inline-flex items-center gap-2 text-sm font-medium text-accent transition-[opacity,transform] duration-200 hover:-translate-y-0.5 hover:opacity-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-4 focus-visible:ring-offset-surface"
                 >
-                  Plan your supply
-
-                  <ArrowRight
-                    size={16}
-                    strokeWidth={2.5}
-                    className="transition-transform duration-200 group-hover:translate-x-0.5"
-                  />
+                  
                 </Link>
               </div>
             </Reveal>

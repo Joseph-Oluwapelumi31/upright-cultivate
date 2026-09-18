@@ -126,17 +126,17 @@ export default function MobileNav() {
             {/* Top navigation */}
             <div className="flex items-center justify-between">
               <Link
-                href="#"
+                href="/"
                 aria-label="Upright Cultivate home"
                 className="
                   flex size-14 shrink-0 items-center justify-center
                   rounded-full
                   border border-white/30
-                  bg-white/55
+                  bg-surface/90
                   text-primary
                   backdrop-blur-xl
                   transition-colors duration-200
-                  hover:bg-white/70
+                  hover:bg-surface/70
                 "
               >
                 <Image
@@ -160,11 +160,11 @@ export default function MobileNav() {
                   flex size-14 shrink-0 cursor-pointer items-center justify-center
                   rounded-full
                   border border-white/30
-                  bg-white/55
+                  bg-surface/90
                   text-primary
                   backdrop-blur-xl
                   transition-colors duration-200
-                  hover:bg-white/70
+                  hover:bg-surface/70
                 "
               >
                 {menuOpen ? (
@@ -228,7 +228,7 @@ export default function MobileNav() {
                   ))}
 
                   <Button
-                    href="#supply-planner"
+                    href="/supply"
                     variant="primary"
                     className="mt-2 w-full"
                     onClick={closeMenu}

@@ -243,7 +243,7 @@ export default function SupplyPlanner() {
     if (!item) return null;
 
     return (
-      <div className="flex items-center gap-1 rounded-full border border-primary/15 bg-primary/5 p-1">
+      <div className="flex items-center gap-1 rounded-full border border-primary/15 bg-primary/5">
         <button
           type="button"
           aria-label={`Decrease ${item.name} quantity`}
@@ -337,7 +337,7 @@ export default function SupplyPlanner() {
     return (
       <section className="bg-background py-20 text-foreground md:py-28">
         <Container>
-          <div className="mx-auto max-w-2xl">
+          <div className=" max-w-2xl">
             <div className="rounded-4xl border border-primary/10 bg-white/65 p-6 shadow-sm sm:p-10">
               <div className="grid size-12 place-items-center rounded-full bg-primary text-white">
                 <Check size={24} />
