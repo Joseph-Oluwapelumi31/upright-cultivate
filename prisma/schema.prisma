@@ -1,0 +1,582 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────
+
+// V1 has exactly two roles; no sub-roles until operational requirements justify them
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+// Maps to BUSINESS_RULES §3 business types and existing Zod validation
+enum BusinessType {
+  RESTAURANT
+  HOTEL
+  CAFE
+  RETAIL
+  CATERING
+  MEAL_PREP
+  COMMERCIAL_KITCHEN
+  OTHER
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// KG or per-UNIT as documented in BUSINESS_RULES §5.1
+enum ProductUnit {
+  KG
+  UNIT
+}
+
+// BUSINESS_RULES §8.1 / ARCHITECTURE §20
+enum RequestStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  QUOTED
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  // Used when a request is fully converted to an order via quote acceptance
+  CONVERTED
+}
+
+// BUSINESS_RULES §11.2 / ARCHITECTURE §20
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+// BUSINESS_RULES §13.1 / ARCHITECTURE §20
+enum OrderStatus {
+  CONFIRMED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
+// BUSINESS_RULES §17.3
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  OVERDUE
+  VOID
+  CANCELLED
+}
+
+// Thin model — payment provider is unconfirmed (BUSINESS_RULES §18)
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// Shared table for email-verification and password-reset tokens
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+// ─────────────────────────────────────────────────
+// AUTH MODELS
+// ─────────────────────────────────────────────────
+
+// User is the authenticated identity for both CUSTOMER and ADMIN roles.
+// passwordHash is nullable to leave room for future OAuth providers, but
+// for V1 credentials-based auth it will always be set on sign-up.
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  role          UserRole  @default(CUSTOMER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions           Session[]
+  verificationTokens VerificationToken[]
+  profile            CustomerProfile?
+  businesses         Business[]
+  supplyRequests     SupplyRequest[]
+
+  @@map("users")
+}
+
+// Server-side session records allow token revocation — important for B2B security.
+// The JWT cookie references a session token looked up against this table.
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// Unified token table for email verification and password reset.
+// Tokens are hashed before storage; the type field distinguishes usage.
+model VerificationToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  type      TokenType
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("verification_tokens")
+}
+
+// ─────────────────────────────────────────────────
+// CUSTOMER MODELS
+// ─────────────────────────────────────────────────
+
+// CustomerProfile is a 1-to-1 extension of User for customer-specific
+// domain data that does not belong on the auth identity.
+// Only CUSTOMER users will have a profile; ADMIN users will not.
+model CustomerProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  phone     String?
+  // Admin-only notes about this customer account
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Restrict: a User with a CustomerProfile cannot be deleted without first
+  // explicitly removing the profile. Prevents accidental data loss.
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@map("customer_profiles")
+}
+
+// A customer may manage one or more businesses (BUSINESS_RULES §3).
+// Businesses are the primary ownership boundary for commercial records.
+model Business {
+  id           String       @id @default(cuid())
+  userId       String
+  name         String
+  type         BusinessType
+  contactName  String?
+  contactEmail String?
+  contactPhone String?
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Restrict: do not cascade-delete businesses when a user record is deleted;
+  // the admin must explicitly remove the business and its dependent records first.
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  locations      Location[]
+  supplyRequests SupplyRequest[]
+  quotes         Quote[]
+  orders         Order[]
+  invoices       Invoice[]
+
+  @@index([userId])
+  @@map("businesses")
+}
+
+// Delivery locations belong to a business (BUSINESS_RULES §4).
+// Soft-deletion via isActive is preferred over hard deletion to preserve
+// historical order/invoice references.
+model Location {
+  id           String   @id @default(cuid())
+  businessId   String
+  name         String
+  address      String
+  city         String
+  state        String?
+  country      String   @default("Nigeria")
+  contactName  String?
+  contactPhone String?
+  // Optional delivery notes for this specific location
+  notes        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Restrict: prefer deactivation over deletion (BUSINESS_RULES §4).
+  business Business @relation(fields: [businessId], references: [id], onDelete: Restrict)
+
+  supplyRequests SupplyRequest[]
+  quotes         Quote[]
+  orders         Order[]
+
+  @@index([businessId])
+  @@map("locations")
+}
+
+// ─────────────────────────────────────────────────
+// PRODUCT CATALOGUE
+// ─────────────────────────────────────────────────
+
+model ProductCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("product_categories")
+}
+
+// Products are the fresh-produce items offered by Upright Cultivate.
+// status INACTIVE hides a product from new supply requests while
+// preserving it in historical transaction records (BUSINESS_RULES §5.2).
+model Product {
+  id          String        @id @default(cuid())
+  categoryId  String
+  name        String
+  slug        String        @unique
+  description String?
+  imageUrl    String?
+  unit        ProductUnit
+  status      ProductStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Restrict: cannot delete a category while products reference it.
+  category ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  prices             ProductPrice[]
+  availability       ProductAvailability[]
+  supplyRequestItems SupplyRequestItem[]
+  quoteItems         QuoteItem[]
+  orderItems         OrderItem[]
+  invoiceItems       InvoiceItem[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@map("products")
+}
+
+// V1: one active price per product. effectiveFrom/effectiveUntil support
+// future price history without schema changes (BUSINESS_RULES §6.3, ARCHITECTURE §15).
+// Decimal(10,2) supports amounts up to 99,999,999.99 — appropriate for NGN.
+model ProductPrice {
+  id             String    @id @default(cuid())
+  productId      String
+  price          Decimal   @db.Decimal(10, 2)
+  currency       String    @default("NGN")
+  effectiveFrom  DateTime  @default(now())
+  effectiveUntil DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+
+  // Cascade: prices are owned data of the product.
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([productId, isActive])
+  @@map("product_prices")
+}
+
+// Admin-managed availability state (ARCHITECTURE §16).
+// This is NOT inventory management — it is an admin flag with optional notes.
+// V1: one availability record per product; admin updates it as needed.
+model ProductAvailability {
+  id            String    @id @default(cuid())
+  productId     String
+  isAvailable   Boolean   @default(true)
+  // Admin-provided estimate of when the product will be available again
+  estimatedDate DateTime?
+  notes         String?
+  updatedAt     DateTime  @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_availability")
+}
+
+// ─────────────────────────────────────────────────
+// COMMERCE MODELS
+// ─────────────────────────────────────────────────
+
+// A supply request is a customer's intention to purchase produce.
+// It is NOT an order. The workflow requires admin review and a quote
+// before an order is created (ARCHITECTURE §13, BUSINESS_RULES §10).
+model SupplyRequest {
+  id                    String        @id @default(cuid())
+  // Human-friendly reference displayed in the UI (e.g. SR-2026-0001)
+  referenceNumber       String        @unique
+  userId                String
+  businessId            String
+  locationId            String
+  status                RequestStatus @default(DRAFT)
+  // Stored as a string to match existing Zod validation values
+  frequency             String?
+  preferredDeliveryDate DateTime?
+  isRecurring           Boolean       @default(false)
+  notes                 String?
+  adminNotes            String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  // Restrict everywhere: historical supply requests must survive upstream changes.
+  user     User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  items  SupplyRequestItem[]
+  quotes Quote[]
+
+  @@index([userId])
+  @@index([businessId])
+  @@index([status])
+  @@map("supply_requests")
+}
+
+// Individual product lines within a supply request.
+// productNameSnapshot preserves the product name as it was at request time,
+// since product names can change in the catalogue (ARCHITECTURE §22).
+model SupplyRequestItem {
+  id                  String      @id @default(cuid())
+  requestId           String
+  productId           String
+  // Snapshot: preserves product name even if the catalogue changes later
+  productNameSnapshot String
+  quantity            Decimal     @db.Decimal(10, 3)
+  unit                ProductUnit
+  notes               String?
+
+  // Cascade: items are owned by the request — if the request is deleted, items go too.
+  request SupplyRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  // Restrict: do not allow deletion of a product that appears in historical requests.
+  product Product       @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([requestId])
+  @@map("supply_request_items")
+}
+
+// A quote is Upright Cultivate's commercial offer in response to a supply request.
+// One request can have multiple quotes (e.g. a revised quote replaces a draft).
+// Prices on the quote are captured at quote-creation time and must not change
+// when product prices change (BUSINESS_RULES §11.1, ARCHITECTURE §15).
+model Quote {
+  id                String      @id @default(cuid())
+  referenceNumber   String      @unique
+  requestId         String
+  businessId        String
+  locationId        String
+  status            QuoteStatus @default(DRAFT)
+  subtotal          Decimal     @db.Decimal(10, 2)
+  // Nullable: delivery fees and other charges are unconfirmed in V1
+  additionalCharges Decimal?    @db.Decimal(10, 2)
+  total             Decimal     @db.Decimal(10, 2)
+  currency          String      @default("NGN")
+  validUntil        DateTime?
+  notes             String?
+  adminNotes        String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Restrict: quotes are commercial records; upstream deletions must not destroy them.
+  request  SupplyRequest @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  business Business      @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  location Location      @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  items QuoteItem[]
+  order Order?
+
+  @@index([requestId])
+  @@index([status])
+  @@map("quotes")
+}
+
+// Quote line items capture the price at the moment the quote is created.
+// unitPrice is the authoritative price for this transaction — it does not
+// change when ProductPrice changes (BUSINESS_RULES §11.1).
+model QuoteItem {
+  id                  String      @id @default(cuid())
+  quoteId             String
+  productId           String
+  productNameSnapshot String
+  quantity            Decimal     @db.Decimal(10, 3)
+  unit                ProductUnit
+  unitPrice           Decimal     @db.Decimal(10, 2)
+  lineTotal           Decimal     @db.Decimal(10, 2)
+
+  // Cascade: quote items are owned by the quote.
+  quote   Quote   @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  // Restrict: do not delete products referenced in historical quotes.
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([quoteId])
+  @@map("quote_items")
+}
+
+// An order is created when a customer accepts a quote (BUSINESS_RULES §13, ARCHITECTURE §14).
+// quoteId @unique enforces one-order-per-quote at the database level.
+// Order totals are copied from the accepted quote and must not be recalculated
+// from today's product prices (ARCHITECTURE §14, BUSINESS_RULES §6.3).
+model Order {
+  id                    String      @id @default(cuid())
+  orderNumber           String      @unique
+  // Unique constraint: one order can result from one accepted quote
+  quoteId               String      @unique
+  businessId            String
+  locationId            String
+  status                OrderStatus @default(CONFIRMED)
+  subtotal              Decimal     @db.Decimal(10, 2)
+  additionalCharges     Decimal?    @db.Decimal(10, 2)
+  total                 Decimal     @db.Decimal(10, 2)
+  currency              String      @default("NGN")
+  preferredDeliveryDate DateTime?
+  confirmedDeliveryDate DateTime?
+  adminNotes            String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Restrict: orders are financial records. Restrict everywhere.
+  quote    Quote    @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  items    OrderItem[]
+  invoices Invoice[]
+
+  @@index([businessId])
+  @@index([status])
+  @@map("orders")
+}
+
+// Order line items preserve the commercial terms from the accepted quote.
+// Prices are snapshot values — do not recalculate from current ProductPrice.
+model OrderItem {
+  id                  String      @id @default(cuid())
+  orderId             String
+  productId           String
+  productNameSnapshot String
+  quantity            Decimal     @db.Decimal(10, 3)
+  unit                ProductUnit
+  unitPrice           Decimal     @db.Decimal(10, 2)
+  lineTotal           Decimal     @db.Decimal(10, 2)
+
+  // Restrict: financial records must not cascade-delete.
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+// Invoice is generated after delivery (BUSINESS_RULES §17.1 — provisional rule).
+// V1: one invoice per order is the expected pattern, but the schema allows
+// multiple invoices per order if the business requires it (e.g. partial invoicing).
+model Invoice {
+  id                String        @id @default(cuid())
+  invoiceNumber     String        @unique
+  orderId           String
+  businessId        String
+  status            InvoiceStatus @default(DRAFT)
+  subtotal          Decimal       @db.Decimal(10, 2)
+  additionalCharges Decimal?      @db.Decimal(10, 2)
+  total             Decimal       @db.Decimal(10, 2)
+  currency          String        @default("NGN")
+  issueDate         DateTime?
+  // Nullable: payment terms are unconfirmed (BUSINESS_RULES §30 open question 2)
+  dueDate           DateTime?
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Restrict: invoices are financial records.
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Restrict)
+
+  items    InvoiceItem[]
+  payments Payment[]
+
+  @@index([orderId])
+  @@index([status])
+  @@map("invoices")
+}
+
+// Invoice line items preserve what was invoiced at the time of invoicing.
+// productId is nullable to support non-product line items such as delivery fees
+// when/if those are confirmed (BUSINESS_RULES §30 open question 8).
+model InvoiceItem {
+  id                  String  @id @default(cuid())
+  invoiceId           String
+  // Nullable: allows non-product line items (e.g. delivery charges)
+  productId           String?
+  productNameSnapshot String
+  // description used for non-product lines
+  description         String?
+  quantity            Decimal @db.Decimal(10, 3)
+  // Stored as String to support "delivery fee" or other non-unit items
+  unit                String
+  unitPrice           Decimal @db.Decimal(10, 2)
+  lineTotal           Decimal @db.Decimal(10, 2)
+
+  invoice Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  product Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([invoiceId])
+  @@map("invoice_items")
+}
+
+// Payment is a thin, provider-agnostic record (BUSINESS_RULES §18).
+// The payment provider is unconfirmed; providerRef holds whatever reference
+// the chosen provider returns. No payment processing logic lives here.
+// Raw card details must never be stored.
+model Payment {
+  id          String        @id @default(cuid())
+  invoiceId   String
+  amount      Decimal       @db.Decimal(10, 2)
+  currency    String        @default("NGN")
+  status      PaymentStatus @default(PENDING)
+  // External payment provider reference (e.g. Paystack reference, bank transfer ref)
+  providerRef String?       @unique
+  // Payment method is left unstructured until the provider is confirmed
+  method      String?
+  paidAt      DateTime?
+  notes       String?
+  createdAt   DateTime      @default(now())
+
+  // Restrict: payments are financial records — never cascade-delete.
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@index([invoiceId])
+  @@map("payments")
+}
