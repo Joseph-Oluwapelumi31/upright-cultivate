@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -24,18 +25,73 @@ type SupplyPlanContextType = {
   itemCount: number;
 };
 
+const STORAGE_KEY = "upright-supply-plan";
+
 const SupplyPlanContext = createContext<
   SupplyPlanContextType | undefined
 >(undefined);
+
+function getStoredPlan(): SupplyPlanItem[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const storedPlan = window.localStorage.getItem(STORAGE_KEY);
+
+    if (!storedPlan) {
+      return [];
+    }
+
+    const parsedPlan: unknown = JSON.parse(storedPlan);
+
+    if (!Array.isArray(parsedPlan)) {
+      return [];
+    }
+
+    return parsedPlan;
+  } catch (error) {
+    console.error(
+      "Failed to load supply plan from localStorage:",
+      error
+    );
+
+    return [];
+  }
+}
 
 export function SupplyPlanProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [items, setItems] = useState<SupplyPlanItem[]>([]);
+  const [items, setItems] = useState<SupplyPlanItem[]>(
+    getStoredPlan
+  );
 
-  const addItem = (item: Omit<SupplyPlanItem, "quantity">) => {
+  /*
+   * Persist changes to localStorage.
+   *
+   * This effect only synchronizes React state
+   * with the external storage system.
+   */
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(items)
+      );
+    } catch (error) {
+      console.error(
+        "Failed to save supply plan to localStorage:",
+        error
+      );
+    }
+  }, [items]);
+
+  const addItem = (
+    item: Omit<SupplyPlanItem, "quantity">
+  ) => {
     setItems((current) => {
       const exists = current.some(
         (existingItem) => existingItem.id === item.id
@@ -61,13 +117,19 @@ export function SupplyPlanProvider({
     );
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (
+    id: string,
+    quantity: number
+  ) => {
     if (quantity < 1) return;
 
     setItems((current) =>
       current.map((item) =>
         item.id === id
-          ? { ...item, quantity }
+          ? {
+              ...item,
+              quantity,
+            }
           : item
       )
     );

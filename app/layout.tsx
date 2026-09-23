@@ -57,10 +57,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${bricolage.variable} ${poppins.variable}`}>
         <SupplyPlanProvider>
-          {/* <Navbar /> */}
-          {/* <MobileNav /> */}
+          <Navbar />
+          <MobileNav />
           {children}
-          {/* <Footer /> */}
+          <Footer />
         </SupplyPlanProvider>
       </body>
     </html>

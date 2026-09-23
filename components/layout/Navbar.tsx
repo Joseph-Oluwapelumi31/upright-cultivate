@@ -49,7 +49,7 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed left-0 top-0 z-50 w-full bg-transparent py-7 transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-50 w-full bg-transparent h-20 py-7 transition-transform duration-300 ${
         showNavbar ? "translate-y-0" : "-translate-y-full"
       }`}
     >
