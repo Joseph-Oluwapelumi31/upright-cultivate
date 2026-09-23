@@ -7,7 +7,7 @@ import { useSupplyPlan } from "@/components/supply-plan/SupplyPlanProvider";
 import {
   submitSupplyRequest,
   type SupplyRequestState,
-} from "@/app/actions/supply-request";
+} from "@/actions/supply-request";
 
 type SupplyRequestFormProps = {
   frequency: string;

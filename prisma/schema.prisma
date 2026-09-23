@@ -108,8 +108,13 @@ enum TokenType {
 // ─────────────────────────────────────────────────
 
 // User is the authenticated identity for both CUSTOMER and ADMIN roles.
-// passwordHash is nullable to leave room for future OAuth providers, but
-// for V1 credentials-based auth it will always be set on sign-up.
+//
+// Auth.js handles the authentication/session lifecycle, while this model
+// contains our application-specific user data such as role and passwordHash.
+//
+// passwordHash is nullable because Auth.js can support OAuth providers
+// where the user does not have a local password. For credentials-based
+// authentication, we will store an Argon2 password hash here.
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -120,23 +125,31 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  sessions           Session[]
-  verificationTokens VerificationToken[]
-  profile            CustomerProfile?
-  businesses         Business[]
-  supplyRequests     SupplyRequest[]
+  // Auth.js relations
+  accounts Account[]
+  sessions Session[]
+
+  // Application-specific relations
+  profile        CustomerProfile?
+  businesses     Business[]
+  supplyRequests SupplyRequest[]
 
   @@map("users")
 }
 
-// Server-side session records allow token revocation — important for B2B security.
-// The JWT cookie references a session token looked up against this table.
+// Auth.js database session.
+//
+// Auth.js creates and manages these sessions when using the Prisma Adapter
+// with database sessions. We do NOT manually generate session tokens,
+// create sessions, or manage the session cookie ourselves.
+//
+// The sessionToken is used by Auth.js to identify the authenticated session.
+// The browser cookie is managed by Auth.js.
 model Session {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  userId    String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -144,22 +157,48 @@ model Session {
   @@map("sessions")
 }
 
-// Unified token table for email verification and password reset.
-// Tokens are hashed before storage; the type field distinguishes usage.
-model VerificationToken {
-  id        String    @id @default(cuid())
-  token     String    @unique
-  type      TokenType
-  userId    String
-  expiresAt DateTime
-  createdAt DateTime  @default(now())
+// Auth.js account records.
+//
+// This connects a User to an external authentication provider such as
+// Google. We may initially use credentials-based authentication, but
+// keeping the standard Auth.js Account model allows OAuth providers to
+// be added later without redesigning the User model.
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([provider, providerAccountId])
   @@index([userId])
-  @@map("verification_tokens")
+  @@map("accounts")
 }
 
+// Auth.js verification-token records.
+//
+// These are used by Auth.js for verification flows such as email-based
+// authentication when applicable.
+//
+// This is separate from our application data and is managed by Auth.js.
+// Do not use this model as a session or authentication-cookie store.
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
 // ─────────────────────────────────────────────────
 // CUSTOMER MODELS
 // ─────────────────────────────────────────────────
@@ -339,6 +378,7 @@ model SupplyRequest {
   id                    String        @id @default(cuid())
   // Human-friendly reference displayed in the UI (e.g. SR-2026-0001)
   referenceNumber       String        @unique
+  submissionKey         String        @unique
   userId                String
   businessId            String
   locationId            String
