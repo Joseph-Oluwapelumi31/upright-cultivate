@@ -22,7 +22,7 @@ const businessLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-secondary text-primary-foreground">
+    <footer className="bg-primary text-primary-foreground">
       <Container className="py-16 sm:py-20">
         {/* Main footer */}
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-8">

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
@@ -14,8 +15,7 @@ import {
   Search,
 } from "lucide-react";
 import { useSupplyPlan } from "@/components/supply-plan/SupplyPlanProvider";
-import SupplyRequestForm from "@/components/supply-plan/SupplyRequestForm";
-import { productGroups } from "@/components/home/Products";
+
 
 type PlannerStep = "plan" | "review" | "request" | "received";
 
@@ -70,7 +70,14 @@ function formatVolume(value: number, unit = "kg") {
   return `${formatted} ${unit}`;
 }
 
-export default function SupplyPlanner() {
+export default function SupplyPlanner({ 
+  isAuthenticated = false,
+  initialGroups = []
+}: { 
+  isAuthenticated?: boolean;
+  initialGroups?: { title: string; items: { id: string; name: string }[] }[];
+}) {
+  const router = useRouter();
   const {
     items,
     addItem,
@@ -84,9 +91,19 @@ export default function SupplyPlanner() {
   const [businessType, setBusinessType] = useState("Restaurant");
   const [productQuery, setProductQuery] = useState("");
   const [activeGroup, setActiveGroup] = useState(
-    productGroups[0]?.title ?? "",
+    initialGroups[0]?.title ?? "",
   );
   const [plannerError, setPlannerError] = useState("");
+
+  useEffect(() => {
+    const savedFrequency = window.localStorage.getItem("upright-supply-frequency");
+    // eslint-disable-next-line
+    if (savedFrequency) setFrequency(savedFrequency);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("upright-supply-frequency", frequency);
+  }, [frequency]);
 
   const selectedIds = useMemo(
     () => new Set(items.map((item) => item.id)),
@@ -101,9 +118,9 @@ export default function SupplyPlanner() {
   const filteredGroups = useMemo(() => {
     const query = productQuery.trim().toLowerCase();
 
-    if (!query) return productGroups;
+    if (!query) return initialGroups;
 
-    return productGroups
+    return initialGroups
       .map((group) => ({
         ...group,
         items: group.items.filter((product) =>
@@ -111,7 +128,7 @@ export default function SupplyPlanner() {
         ),
       }))
       .filter((group) => group.items.length > 0);
-  }, [productQuery]);
+  }, [productQuery, initialGroups]);
 
   const visibleGroup = useMemo(() => {
     if (productQuery.trim()) {
@@ -218,14 +235,15 @@ export default function SupplyPlanner() {
       return;
     }
 
-    setStep("request");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!isAuthenticated) {
+      router.push("/signin?next=/supply/checkout");
+      return;
+    }
+
+    router.push("/supply/checkout");
   };
 
-  const handleRequestReceived = () => {
-    setStep("received");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+
 
   const handleStartNewPlan = () => {
     clearPlan();
@@ -578,7 +596,7 @@ export default function SupplyPlanner() {
                           }
                           className="h-11 w-full appearance-none rounded-xl border border-primary/10 bg-background px-4 pr-10 text-sm font-medium outline-none focus:border-primary/30 focus:ring-4 focus:ring-primary/5"
                         >
-                          {productGroups.map((group) => (
+                          {initialGroups.map((group) => (
                             <option
                               key={group.title}
                               value={group.title}
@@ -599,7 +617,7 @@ export default function SupplyPlanner() {
                   {/* Desktop category tabs */}
                   {!productQuery.trim() && (
                     <div className="mt-6 hidden gap-2 overflow-x-auto pb-1 md:flex">
-                      {productGroups.map((group) => (
+                      {initialGroups.map((group) => (
                         <button
                           key={group.title}
                           type="button"
@@ -841,42 +859,7 @@ export default function SupplyPlanner() {
             </div>
           )}
 
-          {/* REQUEST */}
-          {step === "request" && (
-            <div className="mt-10">
-              <div className="overflow-hidden rounded-[1.75rem] border border-primary/10 bg-white/65 shadow-sm">
-                <div className="px-5 py-7 sm:px-8 sm:py-9">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary/55">
-                    Step 03
-                  </p>
-
-                  <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-                    Tell us where to reach you.
-                  </h2>
-
-                  <p className="mt-2 max-w-xl text-sm leading-6 text-foreground/55">
-                    Share your business details and we’ll follow up about your
-                    supply requirements.
-                  </p>
-
-                  <div className="mt-8">
-                    <SupplyRequestForm
-                      frequency={frequency}
-                      businessType={businessType}
-                      onBack={() => {
-                        setStep("review");
-                        window.scrollTo({
-                          top: 0,
-                          behavior: "smooth",
-                        });
-                      }}
-                      onSuccess={handleRequestReceived}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* REQUEST step removed */}
         </div>
       </Container>
     </section>

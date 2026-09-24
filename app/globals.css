@@ -2,27 +2,39 @@
 
 :root {
   /* =========================================================
-     COLOR
+     PALETTE (from design.md)
      ========================================================= */
+  --color-wheat-cream: #e5dccd;
+  --color-harvest-copper: #ab5700;
+  --color-citron-beam: #e8e359;
+  --color-morning-glory: #7997ff;
+  --color-amber-glow: #d99623;
+  --color-forest-floor: #214534;
+  --color-deep-moss: #103d26;
+  --color-olive-branch: #568037;
+  --color-slate-bloom: #3d549c;
+  --color-coral-petal: #e99686;
 
-  /* Brand */
-  --primary: #103d26;
+  /* =========================================================
+     SEMANTIC COLOR MAPPING (preserving public pages)
+     ========================================================= */
+  --primary: var(--color-deep-moss);
   --primary-foreground: #faf9f4;
 
-  --secondary: #568037;
+  --secondary: var(--color-olive-branch);
   --secondary-foreground: #faf9f4;
 
-  --accent: #e8e359;
-  --accent-foreground: #103d26;
+  --accent: var(--color-citron-beam);
+  --accent-foreground: var(--color-deep-moss);
 
   /* Backgrounds & surfaces */
-  --background: #f4f1e8;
-  --foreground: #172019;
+  --background: #f4f1e8; 
+  --foreground: #172019; 
 
   --surface: #faf9f4;
   --surface-foreground: #172019;
 
-  --surface-dark: #103d26;
+  --surface-dark: var(--color-deep-moss);
   --surface-dark-foreground: #faf9f4;
 
   /* Muted */
@@ -36,66 +48,55 @@
   /* Semantic states */
   --success: #2f7d4a;
   --success-foreground: #faf9f4;
-
   --error: #c84646;
   --error-foreground: #faf9f4;
-
   --warning: #b7791f;
   --warning-foreground: #172019;
-
   --info: #3978a8;
   --info-foreground: #faf9f4;
 
-
   /* =========================================================
-     TYPOGRAPHY
+     TYPOGRAPHY (from design.md)
      ========================================================= */
+  --font-family-display: var(--font-bricolage), "Segoe UI", sans-serif;
+  --font-family-body: var(--font-poppins), "Segoe UI", sans-serif;
 
-  --font-display-family:
-    var(--font-bricolage),
-    "Segoe UI",
-    sans-serif;
+  /* Responsive Type Scale */
+  --font-size-display-xl: clamp(72px, 8vw, 173px);
+  --font-size-display: clamp(56px, 6vw, 104px);
+  --font-size-h1: clamp(40px, 5vw, 70px);
+  --font-size-h2: clamp(32px, 4vw, 56px);
+  --font-size-h3: clamp(24px, 3vw, 30px);
+  --font-size-h4: 20px;
 
-  --font-body-family:
-    var(--font-poppins),
-    "Segoe UI",
-    sans-serif;
-
-  /* Font sizes */
-  --text-display: 72px;
-  --text-h1: 56px;
-  --text-h2: 40px;
-  --text-h3: 32px;
-  --text-h4: 24px;
-
-  --text-body-lg: 18px;
-  --text-body: 16px;
-  --text-small: 14px;
-  --text-caption: 12px;
+  --font-size-body-lg: 18px;
+  --font-size-body: 16px;
+  --font-size-small: 14px;
+  --font-size-caption: 12px;
 
   /* Font weights */
-  --weight-regular: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-  --weight-bold: 700;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   /* Line heights */
-  --leading-display: 1;
-  --leading-heading: 1.1;
-  --leading-body: 1.5;
-  --leading-relaxed: 1.6;
+  --line-height-display-xl: 0.8;
+  --line-height-display: 0.85;
+  --line-height-heading: 0.9;
+  --line-height-heading-sm: 1.0;
+  --line-height-body: 1.4;
+  --line-height-relaxed: 1.5;
 
   /* Letter spacing */
-  --tracking-tight: -0.02em;
-  --tracking-normal: 0;
-  --tracking-wide: 0.04em;
-  --tracking-wider: 0.08em;
-
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.04em;
+  --letter-spacing-wider: 0.08em;
 
   /* =========================================================
-     SPACING
+     SPACING (from design.md & preserving base)
      ========================================================= */
-
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -109,148 +110,106 @@
   --space-20: 80px;
   --space-24: 96px;
   --space-32: 128px;
-
+  
+  /* Additional design.md tokens */
+  --space-56: 56px;
+  --space-100: 100px;
+  --space-140: 140px;
 
   /* =========================================================
-     RADIUS
+     RADIUS (from design.md)
      ========================================================= */
-
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
-
+  --border-radius-card: 20px;
+  --border-radius-button: 31px;
+  --border-radius-tag: 9999px;
+  
+  /* Standard tokens */
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  --border-radius-full: 9999px;
 
   /* =========================================================
      BORDERS
      ========================================================= */
-
-  --border-width: 1px;
-  --border-width-strong: 2px;
-
-
-  /* =========================================================
-     SHADOWS
-     ========================================================= */
-
-  --shadow-sm:
-    0 1px 3px rgb(23 32 25 / 0.06);
-
-  --shadow-md:
-    0 8px 24px rgb(23 32 25 / 0.08);
-
-  --shadow-lg:
-    0 16px 40px rgb(23 32 25 / 0.12);
-
-
-  /* =========================================================
-     MOTION
-     ========================================================= */
-
-  --duration-fast: 150ms;
-  --duration-normal: 200ms;
-  --duration-slow: 300ms;
-
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
-
-
-  /* =========================================================
-     COMPONENT DIMENSIONS
-     ========================================================= */
-
-  /* Controls */
-  --control-sm: 36px;
-  --control-md: 44px;
-  --control-lg: 48px;
-
-  /* Icon buttons */
-  --icon-button-sm: 36px;
-  --icon-button-md: 44px;
-  --icon-button-lg: 48px;
-
-  /* Container widths */
-  --container-sm: 640px;
-  --container-md: 768px;
-  --container-lg: 1024px;
-  --container-xl: 1200px;
-  --container-2xl: 1280px;
+  --stroke-width: 1px;
+  --stroke-width-strong: 2px;
 }
 
 
 /* =========================================================
    TAILWIND THEME
    ========================================================= */
-
 @theme {
   /* Colors */
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
   --color-surface: var(--surface);
   --color-surface-foreground: var(--surface-foreground);
-
   --color-surface-dark: var(--surface-dark);
   --color-surface-dark-foreground: var(--surface-dark-foreground);
-
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
 
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-
-  --color-error: var(--error);
-  --color-error-foreground: var(--error-foreground);
-
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
-
-  --color-info: var(--info);
-  --color-info-foreground: var(--info-foreground);
-
+  /* Palette mapping (for explicit utility generation, e.g., bg-wheat-cream) */
+  --color-wheat-cream: var(--color-wheat-cream);
+  --color-harvest-copper: var(--color-harvest-copper);
+  --color-citron-beam: var(--color-citron-beam);
+  --color-morning-glory: var(--color-morning-glory);
+  --color-amber-glow: var(--color-amber-glow);
+  --color-forest-floor: var(--color-forest-floor);
+  --color-deep-moss: var(--color-deep-moss);
+  --color-olive-branch: var(--color-olive-branch);
+  --color-slate-bloom: var(--color-slate-bloom);
+  --color-coral-petal: var(--color-coral-petal);
 
   /* Typography */
-  --font-display: var(--font-display-family);
-  --font-body: var(--font-body-family);
+  --font-display: var(--font-family-display);
+  --font-body: var(--font-family-body);
 
-  --text-display: var(--text-display);
-  --text-h1: var(--text-h1);
-  --text-h2: var(--text-h2);
-  --text-h3: var(--text-h3);
-  --text-h4: var(--text-h4);
+  --text-display-xl: var(--font-size-display-xl);
+  --text-display: var(--font-size-display);
+  --text-h1: var(--font-size-h1);
+  --text-h2: var(--font-size-h2);
+  --text-h3: var(--font-size-h3);
+  --text-h4: var(--font-size-h4);
+  --text-body-lg: var(--font-size-body-lg);
+  --text-body: var(--font-size-body);
+  --text-small: var(--font-size-small);
+  --text-caption: var(--font-size-caption);
 
-  --text-body-lg: var(--text-body-lg);
-  --text-body: var(--text-body);
-  --text-small: var(--text-small);
-  --text-caption: var(--text-caption);
+  /* Line heights */
+  --leading-display-xl: var(--line-height-display-xl);
+  --leading-display: var(--line-height-display);
+  --leading-heading: var(--line-height-heading);
+  --leading-heading-sm: var(--line-height-heading-sm);
+  --leading-body: var(--line-height-body);
+  --leading-relaxed: var(--line-height-relaxed);
 
+  /* Letter spacing */
+  --tracking-tight: var(--letter-spacing-tight);
+  --tracking-normal: var(--letter-spacing-normal);
+  --tracking-wide: var(--letter-spacing-wide);
+  --tracking-wider: var(--letter-spacing-wider);
 
   /* Radius */
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-  --radius-full: var(--radius-full);
-
-
-  /* Shadows */
-  --shadow-sm: var(--shadow-sm);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-
+  --radius-card: var(--border-radius-card);
+  --radius-button: var(--border-radius-button);
+  --radius-tag: var(--border-radius-tag);
+  --radius-sm: var(--border-radius-sm);
+  --radius-md: var(--border-radius-md);
+  --radius-lg: var(--border-radius-lg);
+  --radius-xl: var(--border-radius-xl);
+  --radius-full: var(--border-radius-full);
 
   /* Spacing */
   --spacing-1: var(--space-1);
@@ -266,13 +225,21 @@
   --spacing-20: var(--space-20);
   --spacing-24: var(--space-24);
   --spacing-32: var(--space-32);
+  --spacing-40: var(--space-40);
+  --spacing-56: var(--space-56);
+  --spacing-64: var(--space-64);
+  --spacing-80: var(--space-80);
+  --spacing-100: var(--space-100);
+  --spacing-140: var(--space-140);
+  
+  /* Shadows are explicitly removed globally per design.md "no shadows" */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
 }
 
-
-/* =========================================================
-   BASE
-   ========================================================= */
-
+/* Base styles */
 * {
   box-sizing: border-box;
 }
@@ -285,8 +252,8 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-body-family);
-  line-height: var(--leading-body);
+  font-family: var(--font-family-body);
+  line-height: var(--line-height-body);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -295,8 +262,8 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-family: var(--font-display-family);
-  font-weight: var(--weight-medium);
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-medium);
 }
 
 img {
@@ -317,15 +284,12 @@ button {
 
 a {
   color: inherit;
-  /* text-decoration: none; */
 }
 
 ::selection {
   background: var(--accent);
   color: var(--accent-foreground);
 }
-
-/* globals.css */
 
 .scrollbar-hidden {
   scrollbar-width: none;

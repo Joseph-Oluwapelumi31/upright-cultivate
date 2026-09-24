@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import type { UserRole } from "@/lib/generated/prisma/browser";
 
 export async function getCurrentUser() {
@@ -15,7 +16,7 @@ export async function requireAuth() {
   const user = await getCurrentUser();
 
   if (!user) {
-    throw new Error("UNAUTHORIZED");
+    redirect("/signin");
   }
 
   return user;
@@ -25,7 +26,7 @@ export async function requireRole(role: UserRole) {
   const user = await requireAuth();
 
   if (user.role !== role) {
-    throw new Error("FORBIDDEN");
+    redirect("/");
   }
 
   return user;

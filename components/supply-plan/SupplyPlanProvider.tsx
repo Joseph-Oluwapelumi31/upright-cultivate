@@ -65,9 +65,14 @@ export function SupplyPlanProvider({
 }: {
   children: ReactNode;
 }) {
-  const [items, setItems] = useState<SupplyPlanItem[]>(
-    getStoredPlan
-  );
+  const [items, setItems] = useState<SupplyPlanItem[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Hydrate from localStorage after initial render
+  useEffect(() => {
+    setItems(getStoredPlan());
+    setIsHydrated(true);
+  }, []);
 
   /*
    * Persist changes to localStorage.
@@ -76,6 +81,7 @@ export function SupplyPlanProvider({
    * with the external storage system.
    */
   useEffect(() => {
+    if (!isHydrated) return;
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
@@ -87,7 +93,7 @@ export function SupplyPlanProvider({
         error
       );
     }
-  }, [items]);
+  }, [items, isHydrated]);
 
   const addItem = (
     item: Omit<SupplyPlanItem, "quantity">
@@ -127,9 +133,9 @@ export function SupplyPlanProvider({
       current.map((item) =>
         item.id === id
           ? {
-              ...item,
-              quantity,
-            }
+            ...item,
+            quantity,
+          }
           : item
       )
     );

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
+import { Loader2 } from "lucide-react";
 
 type ButtonVariant = "primary" | "accent" | "secondary" | "ghost";
 
@@ -9,40 +10,38 @@ interface ButtonProps {
   href?: string;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
+  isLoading?: boolean;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
 }
 
 const baseStyles =
-  "inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-200 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex h-12 items-center justify-center gap-2 rounded-button px-6 text-small font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
 
 const variants: Record<ButtonVariant, string> = {
   /**
    * Primary CTA
-   * Main action used throughout light sections.
    */
   primary:
-    "bg-primary text-primary-foreground shadow-lg shadow-black/10 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "bg-primary text-primary-foreground hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:ring-primary",
 
   /**
    * Accent CTA
-   * Used when the primary color does not provide enough
-   * contrast against the surrounding background, especially the hero.
    */
   accent:
-    "bg-accent text-accent-foreground shadow-lg shadow-black/10 hover:-translate-y-0.5 hover:bg-accent/90 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "bg-accent text-accent-foreground hover:-translate-y-0.5 hover:bg-accent/90 focus-visible:ring-accent",
 
   /**
    * Secondary action
    */
   secondary:
-    "bg-secondary text-secondary-foreground shadow-sm hover:-translate-y-0.5 hover:bg-secondary/90 hover:shadow-md focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "bg-secondary text-secondary-foreground hover:-translate-y-0.5 hover:bg-secondary/90 focus-visible:ring-secondary",
 
   /**
    * Low-emphasis action
    */
   ghost:
-    "h-auto bg-transparent px-0 py-2 text-primary shadow-none hover:text-primary/70 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "h-auto bg-transparent px-0 py-2 text-primary hover:text-primary/70 focus-visible:ring-primary",
 };
 
 export default function Button({
@@ -51,22 +50,25 @@ export default function Button({
   href,
   type = "button",
   disabled = false,
+  isLoading = false,
   className = "",
   onClick,
 }: ButtonProps) {
   const styles = `${baseStyles} ${variants[variant]} ${className}`;
+  const isDisabled = disabled || isLoading;
 
   if (href) {
-    if (disabled) {
+    if (isDisabled) {
       return (
         <span className={styles} aria-disabled="true">
+          {isLoading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
           {children}
         </span>
       );
     }
 
     return (
-      <Link href={href} className={styles} onClick={onClick}>
+      <Link href={href} className={styles} onClick={onClick as any}>
         {children}
       </Link>
     );
@@ -75,10 +77,12 @@ export default function Button({
   return (
     <button
       type={type}
-      disabled={disabled}
+      disabled={isDisabled}
       className={styles}
-      onClick={onClick}
+      onClick={onClick as any}
+      aria-disabled={isDisabled}
     >
+      {isLoading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
       {children}
     </button>
   );

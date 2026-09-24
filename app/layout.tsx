@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque, Poppins } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import MobileNav from "@/components/layout/MobileNav";
+import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 
 import "./globals.css";
@@ -57,10 +58,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${bricolage.variable} ${poppins.variable}`}>
         <SupplyPlanProvider>
-          <Navbar />
-          <MobileNav />
+          <Navigation />
           {children}
-          <Footer />
+          {/* <Footer /> */}
         </SupplyPlanProvider>
       </body>
     </html>

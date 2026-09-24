@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
+import { signOutAction } from "@/actions/auth";
 
 const navLinks = [
   { label: "Why us", href: "/#why" },
@@ -14,7 +15,7 @@ const navLinks = [
   { label: "Industries", href: "/#industries" },
 ];
 
-export default function MobileNav() {
+export default function MobileNav({ user }: { user?: any }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
 
@@ -197,13 +198,20 @@ export default function MobileNav() {
                 className="
                   rounded-3xl
                   border border-white/30
-                  bg-white/65
+                  bg-white/95
                   p-4
-                  shadow-[0_20px_60px_rgba(0,0,0,0.12)]
+                  shadow-sm
                   backdrop-blur-2xl
                 "
               >
                 <div className="flex flex-col gap-1">
+                  {user && (
+                    <div className="px-4 py-3 mb-2 border-b border-border/50">
+                      <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
+                      <p className="text-caption text-muted-foreground truncate">{user.email}</p>
+                    </div>
+                  )}
+
                   {navLinks.map((link, index) => (
                     <Link
                       key={link.href}
@@ -219,7 +227,7 @@ export default function MobileNav() {
                         text-primary
                         opacity-80
                         transition-colors duration-200
-                        hover:bg-white/60
+                        hover:bg-primary/5
                         hover:opacity-100
                       "
                     >
@@ -227,14 +235,67 @@ export default function MobileNav() {
                     </Link>
                   ))}
 
-                  <Button
-                    href="/supply"
-                    variant="primary"
-                    className="mt-2 w-full"
-                    onClick={closeMenu}
-                  >
-                    <p className="text-primary-foreground">Request supply plan</p>
-                  </Button>
+                  {user ? (
+                    <>
+                      <Link
+                        href="/dashboard"
+                        onClick={closeMenu}
+                        className="
+                          rounded-2xl
+                          px-4 py-3.5
+                          text-sm font-medium
+                          text-primary
+                          opacity-80
+                          transition-colors duration-200
+                          hover:bg-primary/5
+                          hover:opacity-100
+                        "
+                      >
+                        Dashboard
+                      </Link>
+                      <div className="mt-2 border-t border-border/50 pt-2">
+                        <form action={signOutAction}>
+                          <button
+                            type="submit"
+                            className="w-full text-left rounded-2xl px-4 py-3.5 text-sm font-medium text-error hover:bg-error/10 transition-colors"
+                            onClick={() => {
+                              // We let form submission handle the logic, but closing menu is nice UX
+                              setTimeout(closeMenu, 100);
+                            }}
+                          >
+                            Sign out
+                          </button>
+                        </form>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/signin"
+                        onClick={closeMenu}
+                        className="
+                          rounded-2xl
+                          px-4 py-3.5
+                          text-sm font-medium
+                          text-primary
+                          opacity-80
+                          transition-colors duration-200
+                          hover:bg-primary/5
+                          hover:opacity-100
+                        "
+                      >
+                        Sign in
+                      </Link>
+                      <Button
+                        href="/supply"
+                        variant="primary"
+                        className="mt-2 w-full"
+                        onClick={closeMenu}
+                      >
+                        <p className="text-primary-foreground">Request supply plan</p>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </nav>
             </div>

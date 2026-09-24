@@ -6,17 +6,29 @@ export default auth((req) => {
 
   const isProtectedRoute =
     pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/admin");
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/supply/checkout");
+    
+  const isAuthRoute = 
+    pathname.startsWith("/signin") || 
+    pathname.startsWith("/signup") || 
+    pathname.startsWith("/forgot-password") || 
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/verify-otp");
 
   if (isProtectedRoute && !isLoggedIn) {
     const signInUrl = new URL("/signin", req.nextUrl.origin);
 
     signInUrl.searchParams.set(
-      "callbackUrl",
-      req.nextUrl.pathname
+      "next",
+      `${req.nextUrl.pathname}${req.nextUrl.search}`
     );
 
     return Response.redirect(signInUrl);
+  }
+  
+  if (isAuthRoute && isLoggedIn) {
+    return Response.redirect(new URL("/dashboard", req.nextUrl.origin));
   }
 });
 
@@ -24,5 +36,11 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/admin/:path*",
+    "/supply/checkout/:path*",
+    "/signin",
+    "/signup",
+    "/forgot-password",
+    "/reset-password",
+    "/verify-otp",
   ],
 };

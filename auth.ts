@@ -69,6 +69,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
 
@@ -78,19 +79,39 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     async jwt({ token, user }) {
+      // Initial sign-in
       if (user) {
         token.id = user.id;
-        token.role = user.role;
       }
 
       return token;
     },
 
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
+      if (!session.user || !token.id) {
+        return session;
       }
+
+      const dbUser = await prisma.user.findUnique({
+        where: {
+          id: token.id as string,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      });
+
+      if (!dbUser) {
+        return session;
+      }
+
+      session.user.id = dbUser.id;
+      session.user.name = dbUser.name;
+      session.user.email = dbUser.email;
+      session.user.role = dbUser.role as UserRole;
 
       return session;
     },

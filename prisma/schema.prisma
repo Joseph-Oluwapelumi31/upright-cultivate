@@ -48,13 +48,13 @@ enum ProductUnit {
 // BUSINESS_RULES §8.1 / ARCHITECTURE §20
 enum RequestStatus {
   DRAFT
+  PENDING
   SUBMITTED
   UNDER_REVIEW
   QUOTED
   ACCEPTED
   REJECTED
   CANCELLED
-  // Used when a request is fully converted to an order via quote acceptance
   CONVERTED
 }
 
@@ -120,6 +120,7 @@ model User {
   name          String
   email         String    @unique
   emailVerified DateTime?
+  image         String?
   passwordHash  String?
   role          UserRole  @default(CUSTOMER)
   createdAt     DateTime  @default(now())
@@ -198,6 +199,21 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+// Stores incomplete registrations until their OTP is verified.
+model PendingSignup {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  otpHash      String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  lastOtpSentAt DateTime?
+
+  @@index([expiresAt])
+  @@map("pending_signups")
 }
 // ─────────────────────────────────────────────────
 // CUSTOMER MODELS

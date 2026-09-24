@@ -130,3 +130,22 @@ export async function updateBusinessAction(
   };
 }
 
+export async function getBusinessesAction() {
+  const user = await requireCustomer();
+  
+  const businesses = await prisma.business.findMany({
+    where: {
+      userId: user.id,
+      isActive: true,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  });
+  
+  return {
+    success: true,
+    businesses,
+  };
+}
+

@@ -242,10 +242,9 @@ export async function submitSupplyRequest(
             locationId: location.id,
 
             /*
-             * Keep this as DRAFT until we confirm
-             * your actual RequestStatus enum.
+             * Initial status as requested.
              */
-            status: "DRAFT",
+            status: "PENDING",
 
             frequency: data.frequency,
 
