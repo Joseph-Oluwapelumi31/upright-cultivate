@@ -1,34 +1,28 @@
 "use server";
-
 import { prisma } from "@/lib/prisma";
-import { requireCustomer } from "@/lib/auth/authorization";
+import { requireAdmin } from "@/lib/auth/authorization";
 import { RequestStatus, Prisma } from "@/lib/generated/prisma/client";
 
-export async function getSupplyRequestsForUser(
-  userId: string,
-  options?: {
-    search?: string;
-    status?: RequestStatus | 'ALL';
-    sort?: 'newest' | 'oldest';
-    page?: number;
-    limit?: number;
-  }
-) {
-  const user = await requireCustomer();
-  if (user.id !== userId) throw new Error("Unauthorized");
-
+export async function getAdminSupplyRequests(options?: {
+  search?: string;
+  status?: RequestStatus | 'ALL';
+  sort?: 'newest' | 'oldest';
+  page?: number;
+  limit?: number;
+}) {
+  await requireAdmin();
   const page = options?.page || 1;
   const limit = options?.limit || 10;
   const skip = (page - 1) * limit;
 
   const where: Prisma.SupplyRequestWhereInput = {
-    userId,
     ...(options?.status && options.status !== 'ALL' ? { status: options.status as RequestStatus } : {}),
     ...(options?.search ? {
       OR: [
         { referenceNumber: { contains: options.search, mode: 'insensitive' } },
         { business: { name: { contains: options.search, mode: 'insensitive' } } },
-        { location: { name: { contains: options.search, mode: 'insensitive' } } }
+        { location: { name: { contains: options.search, mode: 'insensitive' } } },
+        { user: { name: { contains: options.search, mode: 'insensitive' } } }
       ]
     } : {})
   };
@@ -39,6 +33,7 @@ export async function getSupplyRequestsForUser(
       include: {
         business: true,
         location: true,
+        user: true,
         items: true,
       },
       orderBy: {
@@ -50,32 +45,23 @@ export async function getSupplyRequestsForUser(
     prisma.supplyRequest.count({ where })
   ]);
 
-  return {
-    items,
-    total,
-    page,
-    totalPages: Math.ceil(total / limit)
-  };
+  return { items, total, page, totalPages: Math.ceil(total / limit) };
 }
 
-export async function getSupplyRequestForUser(userId: string, requestId: string) {
-  const user = await requireCustomer();
-  if (user.id !== userId) throw new Error("Unauthorized");
-
-  return await prisma.supplyRequest.findFirst({
-    where: {
-      id: requestId,
-      userId, // Critical IDOR protection
-    },
+export async function getAdminSupplyRequest(requestId: string) {
+  await requireAdmin();
+  return await prisma.supplyRequest.findUnique({
+    where: { id: requestId },
     include: {
       business: true,
       location: true,
-      items: true,
-      quotes: {
+      user: {
         include: {
-          order: true
+          profile: true
         }
-      }
+      },
+      items: true,
+      quotes: { include: { order: true } }
     },
   });
 }

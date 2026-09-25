@@ -1,78 +1,186 @@
 import { requireCustomer } from "@/lib/auth/authorization";
 import { getSupplyRequestsForUser } from "@/actions/supply-request-queries";
-import { getBusinessesAction } from "@/actions/business";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { FileText, FileSignature, Package, FileClock } from "lucide-react";
 
 export default async function DashboardOverviewPage() {
   const user = await requireCustomer();
-  const [requestsResult, businessesResult] = await Promise.all([
+  
+  // Fetch data in parallel
+  const [requestsResult, quotes, orders] = await Promise.all([
     getSupplyRequestsForUser(user.id),
-    getBusinessesAction()
+    prisma.quote.findMany({
+      where: { business: { userId: user.id } },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.order.findMany({
+      where: { business: { userId: user.id } },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
-  const requests = requestsResult.slice(0, 5); // show recent 5
-  const businesses = businessesResult.success ? businessesResult.businesses : [];
-  
-  return (
-    <div>
-      <h1 className="text-3xl font-bold font-display mb-8">Welcome back, {user.name}</h1>
+  const requests = requestsResult.items;
 
-      <div className="grid md:grid-cols-2 gap-8 mb-8">
-        <div className="bg-white rounded-xl border p-6 shadow-sm flex flex-col items-start">
-          <h2 className="text-xl font-semibold mb-2">Businesses</h2>
-          <p className="text-gray-500 mb-6 flex-1">You have {businesses.length} registered business{businesses.length !== 1 ? 'es' : ''}.</p>
-          <Button href="/dashboard/businesses" variant="secondary">Manage Businesses</Button>
+  // Summaries
+  const pendingRequests = requests.filter(r => ['DRAFT', 'PENDING', 'SUBMITTED', 'UNDER_REVIEW'].includes(r.status));
+  const activeQuotes = quotes.filter(q => ['DRAFT', 'SENT'].includes(q.status));
+  const activeOrders = orders.filter(o => !['COMPLETED', 'CANCELLED'].includes(o.status));
+
+  // Recent activity logic (combine latest 5 items)
+  const activity = [
+    ...requests.map(r => ({ type: 'request' as const, id: r.id, ref: r.referenceNumber, date: r.createdAt, status: r.status })),
+    ...quotes.map(q => ({ type: 'quote' as const, id: q.id, ref: q.referenceNumber, date: q.createdAt, status: q.status })),
+    ...orders.map(o => ({ type: 'order' as const, id: o.id, ref: o.orderNumber, date: o.createdAt, status: o.status }))
+  ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
+
+  return (
+    <div className="flex flex-col gap-10">
+      {/* 1. Page Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between border-b border-border pb-6">
+        <div>
+          <h1 className="text-3xl font-display font-medium text-foreground mb-1">
+            Welcome back, {user.name}
+          </h1>
+          <p className="text-muted-foreground text-body">
+            Manage your supply plans, review quotes, and track active orders.
+          </p>
         </div>
-        <div className="bg-white rounded-xl border p-6 shadow-sm flex flex-col items-start">
-          <h2 className="text-xl font-semibold mb-2">Supply Requests</h2>
-          <p className="text-gray-500 mb-6 flex-1">You have {requestsResult.length} supply request{requestsResult.length !== 1 ? 's' : ''}.</p>
-          <Button href="/dashboard/requests" variant="secondary">View All Requests</Button>
+        <div className="shrink-0 mt-4 md:mt-0">
+          <Button href="/supply" variant="primary">
+            Create Supply Plan
+          </Button>
         </div>
       </div>
 
-      <h2 className="text-2xl font-bold font-display mb-4">Recent Requests</h2>
-      {requests.length === 0 ? (
-        <div className="bg-white border rounded-xl p-8 text-center text-gray-500">
-          <p>No supply requests yet.</p>
-          <Button href="/supply" variant="primary" className="mt-4">Create a Plan</Button>
-        </div>
-      ) : (
-        <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="p-4 font-semibold text-gray-600">Reference</th>
-                <th className="p-4 font-semibold text-gray-600">Business</th>
-                <th className="p-4 font-semibold text-gray-600">Status</th>
-                <th className="p-4 font-semibold text-gray-600">Date</th>
-                <th className="p-4"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {requests.map(req => (
-                <tr key={req.id} className="hover:bg-gray-50">
-                  <td className="p-4 font-medium">{req.referenceNumber}</td>
-                  <td className="p-4 text-gray-600">{req.business.name}</td>
-                  <td className="p-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {req.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-gray-500">
-                    {new Date(req.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="p-4 text-right">
-                    <Link href={`/dashboard/requests/${req.id}`} className="text-primary hover:underline font-medium">
-                      View
-                    </Link>
-                  </td>
+      {/* Summaries Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 2. Request Summary */}
+        <Card className="flex flex-col">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-primary/5 rounded-md text-primary">
+              <FileText className="size-5" />
+            </div>
+            <h3 className="font-semibold text-foreground">Requests</h3>
+          </div>
+          <div className="text-3xl font-display font-medium text-foreground mb-1">
+            {pendingRequests.length}
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Pending supply requests
+          </p>
+          <Link href="/dashboard/requests" className="text-sm font-medium text-primary hover:underline mt-auto">
+            View all requests &rarr;
+          </Link>
+        </Card>
+
+        {/* 3. Quote Summary */}
+        <Card className="flex flex-col">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-primary/5 rounded-md text-primary">
+              <FileSignature className="size-5" />
+            </div>
+            <h3 className="font-semibold text-foreground">Quotes</h3>
+          </div>
+          <div className="text-3xl font-display font-medium text-foreground mb-1">
+            {activeQuotes.length}
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Active quotes to review
+          </p>
+          <Link href="/dashboard/quotes" className="text-sm font-medium text-primary hover:underline mt-auto">
+            View all quotes &rarr;
+          </Link>
+        </Card>
+
+        {/* 4. Order Summary */}
+        <Card className="flex flex-col">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-primary/5 rounded-md text-primary">
+              <Package className="size-5" />
+            </div>
+            <h3 className="font-semibold text-foreground">Orders</h3>
+          </div>
+          <div className="text-3xl font-display font-medium text-foreground mb-1">
+            {activeOrders.length}
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Active delivery orders
+          </p>
+          <Link href="/dashboard/orders" className="text-sm font-medium text-primary hover:underline mt-auto">
+            View all orders &rarr;
+          </Link>
+        </Card>
+
+        {/* 5. Supply Plan Summary */}
+        <Card className="flex flex-col">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-primary/5 rounded-md text-primary">
+              <FileClock className="size-5" />
+            </div>
+            <h3 className="font-semibold text-foreground">Recurring</h3>
+          </div>
+          <div className="text-3xl font-display font-medium text-foreground mb-1">
+            {requests.filter(r => r.isRecurring && r.status === 'ACCEPTED').length}
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Active recurring supply plans
+          </p>
+          <Link href="/dashboard/plans" className="text-sm font-medium text-primary hover:underline mt-auto">
+            Manage plans &rarr;
+          </Link>
+        </Card>
+      </div>
+
+      {/* 6. Recent Activity */}
+      <section>
+        <h2 className="text-xl font-semibold text-foreground mb-4 border-b border-border pb-2">
+          Recent Activity
+        </h2>
+        {activity.length === 0 ? (
+          <Card className="p-8 text-center">
+            <p className="text-muted-foreground mb-4">No recent activity.</p>
+            <Button href="/supply" variant="primary">Start Your First Plan</Button>
+          </Card>
+        ) : (
+          <div className="overflow-x-auto rounded-card border border-border bg-surface">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-muted/50 border-b border-border">
+                <tr>
+                  <th className="p-4 font-medium text-muted-foreground">Reference</th>
+                  <th className="p-4 font-medium text-muted-foreground">Type</th>
+                  <th className="p-4 font-medium text-muted-foreground">Status</th>
+                  <th className="p-4 font-medium text-muted-foreground">Date</th>
+                  <th className="p-4 text-right"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody className="divide-y divide-border">
+                {activity.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-muted/50 transition-colors">
+                    <td className="p-4 font-medium text-foreground">{item.ref}</td>
+                    <td className="p-4 text-muted-foreground capitalize">{item.type}</td>
+                    <td className="p-4">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="p-4 text-muted-foreground">
+                      {item.date.toLocaleDateString()}
+                    </td>
+                    <td className="p-4 text-right">
+                      <Link href={`/dashboard/${item.type}s/${item.id}`} className="text-primary hover:underline font-medium">
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

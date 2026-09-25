@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Poppins } from "next/font/google";
-import Navbar from "@/components/layout/Navbar";
-import MobileNav from "@/components/layout/MobileNav";
-import Navigation from "@/components/layout/Navigation";
-import Footer from "@/components/layout/Footer";
 
 import "./globals.css";
 import { SupplyPlanProvider } from "@/components/supply-plan/SupplyPlanProvider";
@@ -20,6 +16,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://upright-cultivate.vercel.app"),
   title: "Fresh Leafy Greens & Culinary Herbs Supplier in Nigeria | Upright Cultivate",
   description:
     "Upright Cultivate supplies fresh leafy greens and culinary herbs to restaurants, hotels, cafés, supermarkets, caterers, and commercial kitchens in Nigeria.",
@@ -58,9 +55,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${bricolage.variable} ${poppins.variable}`}>
         <SupplyPlanProvider>
-          <Navigation />
           {children}
-          {/* <Footer /> */}
         </SupplyPlanProvider>
       </body>
     </html>

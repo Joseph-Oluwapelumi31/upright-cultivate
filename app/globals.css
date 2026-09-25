@@ -119,8 +119,8 @@
   /* =========================================================
      RADIUS (from design.md)
      ========================================================= */
-  --border-radius-card: 20px;
-  --border-radius-button: 31px;
+  --border-radius-card: 12px;
+  --border-radius-button: 12px;
   --border-radius-tag: 9999px;
   
   /* Standard tokens */
