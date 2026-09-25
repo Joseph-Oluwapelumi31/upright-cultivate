@@ -3,7 +3,7 @@ import { getAdminSupplyRequest } from "@/actions/admin-request-queries";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/Card";
-import { ArrowLeft, Store, MapPin, Package, User, FileSignature, ReceiptText } from "lucide-react";
+import { ArrowLeft, Store, MapPin, Package, User, FileSignature, ReceiptText, PlusCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { AdminStatusForm, AdminNotesForm } from "@/components/admin/AdminRequestForms";
 
@@ -23,6 +23,9 @@ export default async function AdminRequestDetailsPage({
   const activeQuote = request.quotes?.[0];
   const activeOrder = activeQuote?.order;
 
+  const quoteableStatuses = ["PENDING", "SUBMITTED", "UNDER_REVIEW", "QUOTED"];
+  const isQuoteable = quoteableStatuses.includes(request.status);
+
   return (
     <div className="flex flex-col gap-6 max-w-6xl">
       <div>
@@ -40,10 +43,16 @@ export default async function AdminRequestDetailsPage({
             Submitted on {new Date(request.createdAt).toLocaleDateString()}
           </p>
         </div>
-        <div>
+        <div className="flex flex-wrap items-center gap-3">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-secondary/10 text-secondary border border-secondary/20">
             {request.status}
           </span>
+          {isQuoteable && (
+            <Button href={`/admin/requests/${request.id}/quote/new`} className="py-1 h-9">
+              <PlusCircle className="size-4" />
+              Create Quote
+            </Button>
+          )}
         </div>
       </div>
 
@@ -169,7 +178,7 @@ export default async function AdminRequestDetailsPage({
                       </span>
                     </div>
                     <div className="text-lg font-display font-medium text-foreground mb-3">
-                      {activeQuote.currency} {activeQuote.total.toString()}
+                      {activeQuote.currency || 'NGN'} {activeQuote.total.toString()}
                     </div>
                     <Button href={`/admin/quotes/${activeQuote.id}`} variant="secondary" className="w-full py-1 text-sm">
                       View Quote
@@ -188,7 +197,7 @@ export default async function AdminRequestDetailsPage({
                       </span>
                     </div>
                     <div className="text-lg font-display font-medium text-foreground mb-3">
-                      {activeOrder.currency} {activeOrder.total.toString()}
+                      {activeOrder.currency || 'NGN'} {activeOrder.total.toString()}
                     </div>
                     <Button href={`/admin/orders/${activeOrder.id}`} variant="secondary" className="w-full py-1 text-sm">
                       View Order
