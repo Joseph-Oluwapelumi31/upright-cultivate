@@ -1,19 +1,33 @@
 import Link from "next/link";
-import { ReactNode } from "react";
+import type {
+  MouseEventHandler,
+  ReactNode,
+} from "react";
 import { Loader2 } from "lucide-react";
 
 type ButtonVariant = "primary" | "accent" | "secondary" | "ghost";
 
-interface ButtonProps {
+interface CommonButtonProps {
   children: ReactNode;
   variant?: ButtonVariant;
-  href?: string;
-  type?: "button" | "submit" | "reset";
   disabled?: boolean;
   isLoading?: boolean;
   className?: string;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
 }
+
+interface NativeButtonProps extends CommonButtonProps {
+  href?: never;
+  type?: "button" | "submit" | "reset";
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+}
+
+interface LinkButtonProps extends CommonButtonProps {
+  href: string;
+  type?: never;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+}
+
+type ButtonProps = NativeButtonProps | LinkButtonProps;
 
 const baseStyles =
   "inline-flex h-12 items-center justify-center gap-2 rounded-button px-6 text-small font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
@@ -35,7 +49,7 @@ const variants: Record<ButtonVariant, string> = {
    * Secondary action
    */
   secondary:
-    "bg-secondary text-secondary-foreground hover:-translate-y-0.5 hover:bg-secondary/90 focus-visible:ring-secondary",
+    "border border-primary bg-transparent text-primary hover:bg-primary/5 focus-visible:ring-primary",
 
   /**
    * Low-emphasis action
@@ -44,46 +58,69 @@ const variants: Record<ButtonVariant, string> = {
     "h-auto bg-transparent px-0 py-2 text-primary hover:text-primary/70 focus-visible:ring-primary",
 };
 
-export default function Button({
-  children,
-  variant = "primary",
-  href,
-  type = "button",
-  disabled = false,
-  isLoading = false,
-  className = "",
-  onClick,
-}: ButtonProps) {
+export default function Button(props: ButtonProps) {
+  const {
+    children,
+    variant = "primary",
+    disabled = false,
+    isLoading = false,
+    className = "",
+  } = props;
+
   const styles = `${baseStyles} ${variants[variant]} ${className}`;
   const isDisabled = disabled || isLoading;
 
-  if (href) {
+  const content = (
+    <>
+      {isLoading && (
+        <Loader2
+          className="size-4 animate-spin"
+          aria-hidden="true"
+        />
+      )}
+      {children}
+    </>
+  );
+
+  /*
+   * Link variant
+   */
+  if (props.href !== undefined) {
     if (isDisabled) {
       return (
-        <span className={styles} aria-disabled="true">
-          {isLoading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-          {children}
+        <span
+          className={styles}
+          aria-disabled="true"
+        >
+          {content}
         </span>
       );
     }
 
     return (
-      <Link href={href} className={styles} onClick={onClick as any}>
-        {children}
+      <Link
+        href={props.href}
+        className={styles}
+        onClick={props.onClick}
+      >
+        {content}
       </Link>
     );
   }
 
+  /*
+   * Native button variant
+   */
   return (
     <button
-      type={type}
+      type={props.type ?? "button"}
       disabled={isDisabled}
       className={styles}
-      onClick={onClick as any}
-      aria-disabled={isDisabled}
+      onClick={props.onClick}
+      aria-busy={isLoading || undefined}
     >
-      {isLoading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-      {children}
+      {content}
     </button>
   );
 }
+

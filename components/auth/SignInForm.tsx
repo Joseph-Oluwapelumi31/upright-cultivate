@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { FormField } from "@/components/ui/FormField";
 import Button from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
+import GoogleIcon from "@/components/icons/GoogleIcon";
 
 export default function SignInForm() {
   const router = useRouter();
@@ -25,12 +26,26 @@ export default function SignInForm() {
     }
   }, [state.success, state.message, router]);
 
+  const oauthError = searchParams.get("error");
+  let oauthErrorMessage = "";
+  if (oauthError === "AccessDenied") {
+    oauthErrorMessage = "Google sign-in was cancelled.";
+  } else if (oauthError === "Configuration") {
+    oauthErrorMessage = "There is a problem with the server configuration.";
+  } else if (oauthError) {
+    oauthErrorMessage = "An error occurred during sign in. Please try again.";
+  }
+
   return (
     <>
       <form action={formAction} className="space-y-6">
       <input type="hidden" name="next" value={nextUrl} />
       
-      {!state.success && state.message && (
+      {oauthErrorMessage && (
+        <Alert variant="error">{oauthErrorMessage}</Alert>
+      )}
+
+      {!state.success && state.message && !oauthErrorMessage && (
         <Alert variant="error">{state.message}</Alert>
       )}
 
@@ -92,6 +107,7 @@ export default function SignInForm() {
     <form action={signInWithGoogleAction} className="space-y-6">
       <input type="hidden" name="next" value={nextUrl} />
       <Button type="submit" variant="secondary" className="w-full">
+        <GoogleIcon className="size-5" />
         Continue with Google
       </Button>
     </form>

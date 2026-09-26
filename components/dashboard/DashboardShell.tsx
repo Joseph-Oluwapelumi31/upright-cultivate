@@ -40,7 +40,7 @@ export default function DashboardShell({
     <div className="flex min-h-screen bg-background">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -49,16 +49,15 @@ export default function DashboardShell({
       {/* Sidebar */}
       <aside
         id="mobile-sidebar"
-        className={`fixed inset-y-0 left-0 z-50 w-72 transform border-r border-border bg-surface transition-transform duration-300 lg:static lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-72 transform border-r border-border bg-surface transition-transform duration-300 lg:static lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="flex h-16 items-center border-b border-border px-6">
-          <Link href="/" className="font-display text-xl tracking-tight text-foreground">
+          <Link href="/" className="font-display text-xl font-bold tracking-tight text-foreground">
             Upright Cultivate
           </Link>
         </div>
-        
+
         <nav className="flex-1 space-y-1 p-4">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
@@ -67,16 +66,14 @@ export default function DashboardShell({
                 key={item.name}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`group flex items-center gap-3 rounded-button px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground/70 hover:bg-muted/50 hover:text-foreground"
-                }`}
+                className={`group flex items-center gap-3 rounded-button px-3 py-2 text-sm font-medium transition-colors ${isActive
+                  ? "bg-muted text-foreground"
+                  : "text-foreground/70 hover:bg-muted/50 hover:text-foreground"
+                  }`}
               >
                 <item.icon
-                  className={`size-5 shrink-0 ${
-                    isActive ? "text-primary-foreground" : "text-foreground/50 group-hover:text-foreground"
-                  }`}
+                  className={`size-5 shrink-0 ${isActive ? "text-muted-foreground" : "text-muted/50 group-hover:text-foreground"
+                    }`}
                   aria-hidden="true"
                 />
                 {item.name}
@@ -100,7 +97,7 @@ export default function DashboardShell({
             <span className="sr-only">Open sidebar</span>
             <Menu className="size-6" aria-hidden="true" />
           </button>
-          
+
           <div className="flex flex-1 items-center justify-end">
             <UserMenu user={user} />
           </div>

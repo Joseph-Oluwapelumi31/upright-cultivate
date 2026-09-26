@@ -90,9 +90,15 @@ export async function signUpAction(
       };
     }
 
+    const nextUrl = formData.get("next")?.toString();
+    let messageUrl = `/verify-otp?email=${encodeURIComponent(email)}&purpose=EMAIL_VERIFICATION`;
+    if (nextUrl) {
+      messageUrl += `&next=${encodeURIComponent(nextUrl)}`;
+    }
+
     return {
       success: true,
-      message: `/verify-otp?email=${encodeURIComponent(email)}&purpose=EMAIL_VERIFICATION`,
+      message: messageUrl,
     };
   } catch (error: unknown) {
     if ((error as any)?.digest?.startsWith("NEXT_REDIRECT") || (error as Error)?.message === "NEXT_REDIRECT") {
@@ -257,7 +263,7 @@ export async function signInAction(
   }
 
   const { email, password } = result.data;
-  const callbackUrl = formData.get("next")?.toString() || formData.get("callbackUrl")?.toString() || "/dashboard";
+  let callbackUrl = formData.get("next")?.toString() || formData.get("callbackUrl")?.toString();
 
   try {
     await signIn("credentials", {
@@ -266,6 +272,12 @@ export async function signInAction(
       redirect: false,
     });
     
+    if (!callbackUrl || callbackUrl === "/dashboard") {
+      const { auth } = await import("@/auth");
+      const session = await auth();
+      callbackUrl = session?.user?.role === "ADMIN" ? "/admin" : "/dashboard";
+    }
+
     return {
       success: true,
       message: callbackUrl,
@@ -297,6 +309,11 @@ export async function signOutAction() {
 }
 
 export async function signInWithGoogleAction(formData: FormData) {
-  const callbackUrl = formData.get("next")?.toString() || formData.get("callbackUrl")?.toString() || "/dashboard";
+  let callbackUrl = formData.get("next")?.toString() || formData.get("callbackUrl")?.toString();
+  // We can't await auth() here before signin, so redirect to a special route or just use a route that redirects based on role.
+  // We can redirect them to /signin which proxy.ts handles by redirecting to the correct role dashboard.
+  if (!callbackUrl || callbackUrl === "/dashboard") {
+    callbackUrl = "/signin"; // proxy.ts will catch this since they are logged in and redirect to /admin or /dashboard
+  }
   await signIn("google", { redirectTo: callbackUrl });
 }

@@ -49,7 +49,7 @@ export default function UserMenu({ user }: { user: any }) {
 
       {isOpen && (
         <div 
-          className="absolute right-0 mt-2 w-56 rounded-card border border-border bg-surface shadow-sm py-2 z-50"
+          className="absolute right-0 mt-2 w-64 rounded-card border border-border bg-surface shadow-sm py-2 z-50"
           role="menu"
           aria-orientation="vertical"
         >
@@ -59,12 +59,12 @@ export default function UserMenu({ user }: { user: any }) {
           </div>
           
           <Link 
-            href="/dashboard" 
+            href={user.role === "ADMIN" ? "/admin" : "/dashboard"}
             className="block px-4 py-2 text-sm text-foreground hover:bg-muted/50 transition-colors"
             role="menuitem"
             onClick={() => setIsOpen(false)}
           >
-            Dashboard
+            {user.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}
           </Link>
           
           <div className="mt-2 border-t border-border/50 pt-2 px-2">

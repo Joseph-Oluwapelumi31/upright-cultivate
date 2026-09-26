@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useCallback,
   type ReactNode,
 } from "react";
 
@@ -95,7 +96,7 @@ export function SupplyPlanProvider({
     }
   }, [items, isHydrated]);
 
-  const addItem = (
+  const addItem = useCallback((
     item: Omit<SupplyPlanItem, "quantity">
   ) => {
     setItems((current) => {
@@ -115,15 +116,15 @@ export function SupplyPlanProvider({
         },
       ];
     });
-  };
+  }, []);
 
-  const removeItem = (id: string) => {
+  const removeItem = useCallback((id: string) => {
     setItems((current) =>
       current.filter((item) => item.id !== id)
     );
-  };
+  }, []);
 
-  const updateQuantity = (
+  const updateQuantity = useCallback((
     id: string,
     quantity: number
   ) => {
@@ -139,11 +140,11 @@ export function SupplyPlanProvider({
           : item
       )
     );
-  };
+  }, []);
 
-  const clearPlan = () => {
-    setItems([]);
-  };
+  const clearPlan = useCallback(() => {
+    setItems((current) => current.length === 0 ? current : []);
+  }, []);
 
   const itemCount = useMemo(
     () => items.length,

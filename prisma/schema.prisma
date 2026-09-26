@@ -81,20 +81,10 @@ enum OrderStatus {
 
 // BUSINESS_RULES §17.3
 enum InvoiceStatus {
-  DRAFT
   ISSUED
   PAID
   OVERDUE
-  VOID
   CANCELLED
-}
-
-// Thin model — payment provider is unconfirmed (BUSINESS_RULES §18)
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
 }
 
 // Shared table for email-verification and password-reset tokens
@@ -529,7 +519,7 @@ model Order {
   location Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
 
   items    OrderItem[]
-  invoices Invoice[]
+  invoice  Invoice?
 
   @@index([businessId])
   @@index([status])
@@ -556,22 +546,20 @@ model OrderItem {
   @@map("order_items")
 }
 
-// Invoice is generated after delivery (BUSINESS_RULES §17.1 — provisional rule).
-// V1: one invoice per order is the expected pattern, but the schema allows
-// multiple invoices per order if the business requires it (e.g. partial invoicing).
+// Invoice is generated after delivery (BUSINESS_RULES §17.1).
+// V1: exactly one invoice per order.
 model Invoice {
   id                String        @id @default(cuid())
   invoiceNumber     String        @unique
-  orderId           String
+  orderId           String        @unique
   businessId        String
-  status            InvoiceStatus @default(DRAFT)
+  status            InvoiceStatus @default(ISSUED)
   subtotal          Decimal       @db.Decimal(10, 2)
   additionalCharges Decimal?      @db.Decimal(10, 2)
   total             Decimal       @db.Decimal(10, 2)
   currency          String        @default("NGN")
-  issueDate         DateTime?
-  // Nullable: payment terms are unconfirmed (BUSINESS_RULES §30 open question 2)
-  dueDate           DateTime?
+  issueDate         DateTime      @default(now())
+  dueDate           DateTime
   notes             String?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
@@ -581,58 +569,26 @@ model Invoice {
   business Business @relation(fields: [businessId], references: [id], onDelete: Restrict)
 
   items    InvoiceItem[]
-  payments Payment[]
 
-  @@index([orderId])
   @@index([status])
   @@map("invoices")
 }
 
 // Invoice line items preserve what was invoiced at the time of invoicing.
-// productId is nullable to support non-product line items such as delivery fees
-// when/if those are confirmed (BUSINESS_RULES §30 open question 8).
 model InvoiceItem {
   id                  String  @id @default(cuid())
   invoiceId           String
-  // Nullable: allows non-product line items (e.g. delivery charges)
   productId           String?
   productNameSnapshot String
-  // description used for non-product lines
-  description         String?
   quantity            Decimal @db.Decimal(10, 3)
-  // Stored as String to support "delivery fee" or other non-unit items
-  unit                String
+  unit                ProductUnit
   unitPrice           Decimal @db.Decimal(10, 2)
   lineTotal           Decimal @db.Decimal(10, 2)
 
+  // Restrict: financial records must not cascade-delete.
   invoice Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
   product Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   @@index([invoiceId])
   @@map("invoice_items")
-}
-
-// Payment is a thin, provider-agnostic record (BUSINESS_RULES §18).
-// The payment provider is unconfirmed; providerRef holds whatever reference
-// the chosen provider returns. No payment processing logic lives here.
-// Raw card details must never be stored.
-model Payment {
-  id          String        @id @default(cuid())
-  invoiceId   String
-  amount      Decimal       @db.Decimal(10, 2)
-  currency    String        @default("NGN")
-  status      PaymentStatus @default(PENDING)
-  // External payment provider reference (e.g. Paystack reference, bank transfer ref)
-  providerRef String?       @unique
-  // Payment method is left unstructured until the provider is confirmed
-  method      String?
-  paidAt      DateTime?
-  notes       String?
-  createdAt   DateTime      @default(now())
-
-  // Restrict: payments are financial records — never cascade-delete.
-  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
-
-  @@index([invoiceId])
-  @@map("payments")
 }

@@ -28,7 +28,9 @@ export default auth((req) => {
   }
   
   if (isAuthRoute && isLoggedIn) {
-    return Response.redirect(new URL("/dashboard", req.nextUrl.origin));
+    const role = (req.auth as any)?.user?.role;
+    const destination = role === "ADMIN" ? "/admin" : "/dashboard";
+    return Response.redirect(new URL(destination, req.nextUrl.origin));
   }
 });
 

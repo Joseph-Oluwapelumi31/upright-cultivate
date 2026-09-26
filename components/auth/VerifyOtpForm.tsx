@@ -14,6 +14,7 @@ export default function VerifyOtpForm() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
   const purpose = searchParams.get("purpose") || "PASSWORD_RESET";
+  const nextUrl = searchParams.get("next");
   const [otp, setOtp] = useState("");
   const [countdown, setCountdown] = useState(60);
   const [isResending, setIsResending] = useState(false);
@@ -33,10 +34,10 @@ export default function VerifyOtpForm() {
       if (purpose === "PASSWORD_RESET") {
         router.push(`/reset-password?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`);
       } else {
-        router.push("/signin");
+        router.push(nextUrl ? `/signin?next=${encodeURIComponent(nextUrl)}` : "/signin");
       }
     }
-  }, [state.success, email, otp, router, purpose]);
+  }, [state.success, email, otp, router, purpose, nextUrl]);
 
   useEffect(() => {
     if (countdown > 0) {

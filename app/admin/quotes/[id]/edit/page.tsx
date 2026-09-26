@@ -23,6 +23,37 @@ export default async function AdminEditQuotePage({
     redirect(`/admin/quotes/${id}`);
   }
 
+  // Serialize request for the Client Component
+  // Note: getAdminQuote includes business and location on the quote itself, not nested in request.
+  const requestDTO = {
+    id: quote.request.id,
+    business: { name: quote.business.name },
+    user: { name: quote.request.user.name },
+    location: { name: quote.location.name, address: quote.location.address },
+    items: quote.request.items ? quote.request.items.map((item: any) => ({
+      productId: item.productId,
+      productNameSnapshot: item.productNameSnapshot,
+      quantity: item.quantity.toString(),
+      unit: item.unit
+    })) : []
+  };
+
+  // Serialize quote for the Client Component
+  const quoteDTO = {
+    id: quote.id,
+    additionalCharges: quote.additionalCharges?.toString() || null,
+    validUntil: quote.validUntil ? quote.validUntil.toISOString() : null,
+    notes: quote.notes,
+    adminNotes: quote.adminNotes,
+    items: quote.items.map((item: any) => ({
+      productId: item.productId,
+      productNameSnapshot: item.productNameSnapshot,
+      quantity: item.quantity.toString(),
+      unitPrice: item.unitPrice.toString(),
+      unit: item.unit
+    }))
+  };
+
   return (
     <div className="flex flex-col gap-6 max-w-5xl">
       <div>
@@ -40,7 +71,7 @@ export default async function AdminEditQuotePage({
         </p>
       </div>
 
-      <AdminQuoteForm request={quote.request} quote={quote} />
+      <AdminQuoteForm request={requestDTO} quote={quoteDTO} />
     </div>
   );
 }

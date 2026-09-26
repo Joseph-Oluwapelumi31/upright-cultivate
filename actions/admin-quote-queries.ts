@@ -10,6 +10,7 @@ export async function getAdminQuote(id: string) {
       request: {
         include: {
           user: true,
+          items: true,
         },
       },
       business: true,

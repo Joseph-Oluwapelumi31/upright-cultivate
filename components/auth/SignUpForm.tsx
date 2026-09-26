@@ -27,6 +27,7 @@ export default function SignUpForm() {
 
   return (
     <form action={formAction} className="space-y-6">
+      <input type="hidden" name="next" value={nextUrl} />
       {!state.success && state.message && (
         <Alert variant="error">{state.message}</Alert>
       )}

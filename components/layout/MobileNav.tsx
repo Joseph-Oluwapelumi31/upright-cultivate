@@ -238,7 +238,7 @@ export default function MobileNav({ user }: { user?: any }) {
                   {user ? (
                     <>
                       <Link
-                        href="/dashboard"
+                        href={user.role === "ADMIN" ? "/admin" : "/dashboard"}
                         onClick={closeMenu}
                         className="
                           rounded-2xl
@@ -251,7 +251,7 @@ export default function MobileNav({ user }: { user?: any }) {
                           hover:opacity-100
                         "
                       >
-                        Dashboard
+                        {user.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}
                       </Link>
                       <div className="mt-2 border-t border-border/50 pt-2">
                         <form action={signOutAction}>

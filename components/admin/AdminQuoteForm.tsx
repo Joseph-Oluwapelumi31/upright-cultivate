@@ -11,7 +11,35 @@ import Button from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { Package, Store, MapPin } from "lucide-react";
 
-export default function AdminQuoteForm({ request, quote }: { request: any; quote?: any }) {
+export type AdminQuoteFormRequestDTO = {
+  id: string;
+  business: { name: string };
+  user: { name: string };
+  location: { name: string; address: string };
+  items: Array<{
+    productId: string;
+    productNameSnapshot: string;
+    quantity: string;
+    unit: string;
+  }>;
+};
+
+export type AdminQuoteFormQuoteDTO = {
+  id: string;
+  additionalCharges: string | null;
+  validUntil: string | null;
+  notes: string | null;
+  adminNotes: string | null;
+  items: Array<{
+    productId: string;
+    productNameSnapshot: string;
+    quantity: string;
+    unitPrice: string;
+    unit: string;
+  }>;
+};
+
+export default function AdminQuoteForm({ request, quote }: { request: AdminQuoteFormRequestDTO; quote?: AdminQuoteFormQuoteDTO }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -20,27 +48,27 @@ export default function AdminQuoteForm({ request, quote }: { request: any; quote
   // Initialize quote items from quote (if editing) or request (if creating)
   const [items, setItems] = useState(
     quote
-      ? quote.items.map((item: any) => ({
+      ? quote.items.map((item) => ({
           productId: item.productId,
           productName: item.productNameSnapshot,
           unit: item.unit,
-          requestedQuantity: request.items.find((r: any) => r.productId === item.productId)?.quantity.toString() || "-",
-          quotedQuantity: item.quantity.toString(),
-          unitPrice: item.unitPrice.toString(),
+          requestedQuantity: request.items.find((r) => r.productId === item.productId)?.quantity || "-",
+          quotedQuantity: item.quantity,
+          unitPrice: item.unitPrice,
         }))
-      : request.items.map((item: any) => ({
+      : request.items.map((item) => ({
           productId: item.productId,
           productName: item.productNameSnapshot,
           unit: item.unit,
-          requestedQuantity: item.quantity.toString(),
-          quotedQuantity: item.quantity.toString(),
+          requestedQuantity: item.quantity,
+          quotedQuantity: item.quantity,
           unitPrice: "",
         }))
   );
 
-  const [additionalCharges, setAdditionalCharges] = useState(quote?.additionalCharges?.toString() || "");
+  const [additionalCharges, setAdditionalCharges] = useState(quote?.additionalCharges || "");
   const [validUntil, setValidUntil] = useState(
-    quote?.validUntil ? new Date(quote.validUntil).toISOString().split("T")[0] : ""
+    quote?.validUntil ? quote.validUntil.split("T")[0] : ""
   );
   const [notes, setNotes] = useState(quote?.notes || "");
   const [adminNotes, setAdminNotes] = useState(quote?.adminNotes || "");

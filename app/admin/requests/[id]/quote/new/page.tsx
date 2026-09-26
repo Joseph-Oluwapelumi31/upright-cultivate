@@ -23,6 +23,20 @@ export default async function AdminCreateQuotePage({
     redirect(`/admin/requests/${id}`);
   }
 
+  // Serialize request for the Client Component
+  const requestDTO = {
+    id: request.id,
+    business: { name: request.business.name },
+    user: { name: request.user.name },
+    location: { name: request.location.name, address: request.location.address },
+    items: request.items.map(item => ({
+      productId: item.productId,
+      productNameSnapshot: item.productNameSnapshot,
+      quantity: item.quantity.toString(),
+      unit: item.unit
+    }))
+  };
+
   return (
     <div className="flex flex-col gap-6 max-w-5xl">
       <div>
@@ -40,7 +54,7 @@ export default async function AdminCreateQuotePage({
         </p>
       </div>
 
-      <AdminQuoteForm request={request} />
+      <AdminQuoteForm request={requestDTO} />
     </div>
   );
 }
