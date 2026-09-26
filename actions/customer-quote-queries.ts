@@ -35,6 +35,7 @@ export async function getCustomerQuote(id: string) {
       location: true,
       request: true,
       items: true,
+      order: { select: { id: true } },
     },
   });
 }

@@ -1,8 +1,10 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { requireCustomer } from "@/lib/auth/authorization";
 import { customerQuoteActionSchema } from "@/lib/validations/quote";
+import { revalidatePath } from "next/cache";
 
 export type ActionState = {
   success: boolean;
@@ -76,18 +78,67 @@ export async function acceptQuote(
         throw new Error("Quote is no longer available to be accepted or has expired.");
       }
       
-      // Note: Order creation will happen here in the future
+      const year = new Date().getFullYear();
+      const orderNumber = `ORD-${year}-${crypto
+        .randomUUID()
+        .replaceAll("-", "")
+        .slice(0, 8)
+        .toUpperCase()}`;
+        
+      const quoteItems = await tx.quoteItem.findMany({
+        where: { quoteId: quote.id }
+      });
+      
+      if (quoteItems.length === 0) {
+        throw new Error("Cannot create an order from a quote with no items.");
+      }
+      
+      const orderItemsData = quoteItems.map((item) => ({
+        productId: item.productId,
+        productNameSnapshot: item.productNameSnapshot,
+        quantity: item.quantity,
+        unit: item.unit,
+        unitPrice: item.unitPrice,
+        lineTotal: item.lineTotal,
+      }));
+      
+      await tx.order.create({
+        data: {
+          orderNumber,
+          quoteId: quote.id,
+          businessId: quote.businessId,
+          locationId: quote.locationId,
+          status: "CONFIRMED",
+          subtotal: quote.subtotal,
+          additionalCharges: quote.additionalCharges,
+          total: quote.total,
+          currency: quote.currency,
+          items: {
+            create: orderItemsData,
+          },
+        },
+      });
+
+      // Update the SupplyRequest status to CONVERTED natively
       await tx.supplyRequest.update({
         where: { id: quote.requestId },
-        data: { status: "ACCEPTED" },
+        data: { status: "CONVERTED" },
       });
     });
 
+    revalidatePath("/dashboard/orders");
+    revalidatePath("/admin/orders");
+    revalidatePath(`/dashboard/quotes/${quote.id}`);
+    revalidatePath(`/admin/quotes/${quote.id}`);
+
     return {
       success: true,
-      message: `Quote ${quote.referenceNumber} has been accepted.`,
+      message: `Quote ${quote.referenceNumber} has been accepted and order has been created.`,
     };
   } catch (error: any) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return { success: false, message: "An order has already been created for this quote." };
+    }
     console.error("Failed to accept quote:", error);
     return { success: false, message: error.message || "Failed to accept quote. Please try again." };
   }
