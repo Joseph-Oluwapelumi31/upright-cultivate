@@ -81,6 +81,7 @@ enum OrderStatus {
 
 // BUSINESS_RULES §17.3
 enum InvoiceStatus {
+  DRAFT
   ISSUED
   PAID
   OVERDUE
@@ -281,6 +282,7 @@ model Location {
   supplyRequests SupplyRequest[]
   quotes         Quote[]
   orders         Order[]
+  invoices       Invoice[]
 
   @@index([businessId])
   @@map("locations")
@@ -550,16 +552,17 @@ model OrderItem {
 // V1: exactly one invoice per order.
 model Invoice {
   id                String        @id @default(cuid())
-  invoiceNumber     String        @unique
+  invoiceNumber     String?       @unique
   orderId           String        @unique
   businessId        String
-  status            InvoiceStatus @default(ISSUED)
+  locationId        String
+  status            InvoiceStatus @default(DRAFT)
   subtotal          Decimal       @db.Decimal(10, 2)
   additionalCharges Decimal?      @db.Decimal(10, 2)
   total             Decimal       @db.Decimal(10, 2)
   currency          String        @default("NGN")
-  issueDate         DateTime      @default(now())
-  dueDate           DateTime
+  issueDate         DateTime?
+  dueDate           DateTime?
   notes             String?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
@@ -567,6 +570,7 @@ model Invoice {
   // Restrict: invoices are financial records.
   order    Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
   business Business @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
 
   items    InvoiceItem[]
 
@@ -578,7 +582,7 @@ model Invoice {
 model InvoiceItem {
   id                  String  @id @default(cuid())
   invoiceId           String
-  productId           String?
+  productId           String
   productNameSnapshot String
   quantity            Decimal @db.Decimal(10, 3)
   unit                ProductUnit
@@ -586,8 +590,8 @@ model InvoiceItem {
   lineTotal           Decimal @db.Decimal(10, 2)
 
   // Restrict: financial records must not cascade-delete.
-  invoice Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
-  product Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   @@index([invoiceId])
   @@map("invoice_items")

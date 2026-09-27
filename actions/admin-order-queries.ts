@@ -67,6 +67,7 @@ export async function getAdminOrder(orderId: string) {
       location: true,
       quote: true,
       items: true,
+      invoice: true,
     }
   });
 }

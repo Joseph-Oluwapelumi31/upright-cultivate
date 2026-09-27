@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, LayoutDashboard, ShoppingCart, Store, MapPin, Settings, FileSignature, ShoppingBag } from "lucide-react";
+import { Menu, X, LayoutDashboard, ShoppingCart, Store, MapPin, Settings, FileSignature, ShoppingBag, Receipt } from "lucide-react";
 import UserMenu from "@/components/layout/UserMenu";
 
 const navigation = [
@@ -11,6 +11,7 @@ const navigation = [
   { name: "Requests", href: "/dashboard/requests", icon: ShoppingCart },
   { name: "Quotes", href: "/dashboard/quotes", icon: FileSignature },
   { name: "Orders", href: "/dashboard/orders", icon: ShoppingBag },
+  { name: "Invoices", href: "/dashboard/invoices", icon: Receipt },
   { name: "Businesses", href: "/dashboard/businesses", icon: Store },
   { name: "Locations", href: "/dashboard/locations", icon: MapPin },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
