@@ -9,6 +9,7 @@ const formatCurrency = (amount: number | string, currency = "NGN") => {
 };
 
 import { getInvoiceDisplayStatus, formatInvoiceStatus } from "@/lib/invoice-utils";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function DashboardInvoiceDetailsPage({
   params,
@@ -40,9 +41,7 @@ export default async function DashboardInvoiceDetailsPage({
               <h1 className="text-3xl font-display font-medium text-foreground">
                 {invoice.invoiceNumber ? `Invoice ${invoice.invoiceNumber}` : "Draft Invoice"}
               </h1>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-secondary/10 text-secondary border border-secondary/20">
-                {formatInvoiceStatus(getInvoiceDisplayStatus(invoice.status, invoice.dueDate))}
-              </span>
+              <StatusBadge status={getInvoiceDisplayStatus(invoice.status, invoice.dueDate)} size="lg">{formatInvoiceStatus(getInvoiceDisplayStatus(invoice.status, invoice.dueDate))}</StatusBadge>
             </div>
             <div className="flex flex-col gap-1 mt-2 text-muted-foreground text-sm">
               {invoice.issueDate ? (

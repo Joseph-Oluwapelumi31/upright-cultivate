@@ -68,12 +68,12 @@ export default function DashboardShell({
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
                 className={`group flex items-center gap-3 rounded-button px-3 py-2 text-sm font-medium transition-colors ${isActive
-                  ? "bg-muted text-foreground"
-                  : "text-foreground/70 hover:bg-muted/50 hover:text-foreground"
+                  ? "bg-primary/5 text-primary"
+                  : "text-foreground/70 hover:bg-muted hover:text-foreground"
                   }`}
               >
                 <item.icon
-                  className={`size-5 shrink-0 ${isActive ? "text-muted-foreground" : "text-muted/50 group-hover:text-foreground"
+                  className={`size-5 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                     }`}
                   aria-hidden="true"
                 />

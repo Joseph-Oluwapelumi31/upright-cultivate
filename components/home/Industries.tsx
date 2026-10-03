@@ -69,7 +69,7 @@ export default function Industries() {
               }}
             >
               <div
-                className="mb-8 flex h-10 w-10 items-center justify-center rounded-full border border-(--highlight)/30 bg-(--surface) text-(--highlight)"
+                className="mb-8 flex h-10 w-10 items-center justify-center rounded-full border border-(--accent)/30 bg-(--surface) text-(--accent)"
                 aria-hidden="true"
               >
                 <Icon size={17} strokeWidth={2.2} />

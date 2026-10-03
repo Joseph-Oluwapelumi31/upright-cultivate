@@ -2,6 +2,7 @@ import { getCustomerOrders } from "@/actions/customer-order-queries";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 const formatCurrency = (amount: number | string, currency = "NGN") => {
   return new Intl.NumberFormat('en-NG', { style: 'currency', currency }).format(Number(amount));
@@ -51,9 +52,7 @@ export default async function DashboardOrdersPage() {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                        {order.status}
-                      </span>
+                      <StatusBadge status={order.status} />
                     </td>
                     <td className="p-4 text-right">
                       <Link href={`/dashboard/orders/${order.id}`} className="text-primary hover:underline font-medium inline-flex items-center gap-1">
@@ -74,9 +73,7 @@ export default async function DashboardOrdersPage() {
                     <div className="font-medium text-foreground">{order.orderNumber}</div>
                     <div className="text-sm text-muted-foreground">{formatCurrency(order.total.toString(), order.currency)}</div>
                   </div>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                    {order.status}
-                  </span>
+                  <StatusBadge status={order.status} />
                 </div>
                 <div className="text-sm">
                   <div className="text-foreground">{order.business.name}</div>

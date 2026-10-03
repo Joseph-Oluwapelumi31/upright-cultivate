@@ -333,7 +333,7 @@ export default function Products() {
 
                 {/* Primary: continues the supply-planning flow */}
                 <Button href="/supply" variant="primary">
-                  <p className="text-primary-foreground">Continue to supply planner</p>
+                  Continue to supply planner
                 </Button>
               </div>
             </motion.div>
@@ -593,7 +593,7 @@ export default function Products() {
             </div>
 
             <Button href="/supply" variant="primary">
-              <p className="text-primary-foreground">Plan your supply</p>
+              Plan your supply
             </Button>
           </div>
         </div>

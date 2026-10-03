@@ -77,13 +77,13 @@ export default function AdminShell({
                 onClick={() => setSidebarOpen(false)}
                 className={`group flex items-center gap-3 rounded-button px-3 py-2 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground/70 hover:bg-muted/50 hover:text-foreground"
+                    ? "bg-primary/5 text-primary"
+                    : "text-foreground/70 hover:bg-muted hover:text-foreground"
                 }`}
               >
                 <item.icon
                   className={`size-5 shrink-0 ${
-                    isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"
+                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                   }`}
                   aria-hidden="true"
                 />

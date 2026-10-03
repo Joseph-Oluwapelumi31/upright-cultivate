@@ -4,7 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { ArrowLeft, Store, MapPin, Package, FileSignature, ReceiptText } from "lucide-react";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Button";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function DashboardRequestDetailsPage({
   params,
@@ -48,9 +49,7 @@ export default async function DashboardRequestDetailsPage({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-secondary/10 text-secondary border border-secondary/20">
-            {request.status}
-          </span>
+          <StatusBadge status={request.status} size="xl" />
           {request.status === 'DRAFT' && (
             <Button href={`/supply?request=${request.id}`} variant="primary">Edit Draft</Button>
           )}
@@ -196,9 +195,7 @@ export default async function DashboardRequestDetailsPage({
                       <p className="text-xs text-muted-foreground">{activeQuote.referenceNumber}</p>
                     </div>
                   </div>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                    {activeQuote.status}
-                  </span>
+                  <StatusBadge status={activeQuote.status} />
                 </div>
                 <div className="text-2xl font-display font-medium text-foreground mb-4">
                   {activeQuote.currency} {activeQuote.total.toString()}
@@ -221,9 +218,7 @@ export default async function DashboardRequestDetailsPage({
                       <p className="text-xs text-muted-foreground">{activeOrder.orderNumber}</p>
                     </div>
                   </div>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                    {activeOrder.status}
-                  </span>
+                  <StatusBadge status={activeOrder.status} />
                 </div>
                 <div className="text-2xl font-display font-medium text-foreground mb-4">
                   {activeOrder.currency} {activeOrder.total.toString()}

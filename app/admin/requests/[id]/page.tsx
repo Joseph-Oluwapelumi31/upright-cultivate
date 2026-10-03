@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { ArrowLeft, Store, MapPin, Package, User, FileSignature, ReceiptText, PlusCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { AdminStatusForm, AdminNotesForm } from "@/components/admin/AdminRequestForms";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function AdminRequestDetailsPage({
   params,
@@ -44,9 +45,7 @@ export default async function AdminRequestDetailsPage({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-secondary/10 text-secondary border border-secondary/20">
-            {request.status}
-          </span>
+          <StatusBadge status={request.status} size="xl" />
           {isQuoteable && (
             <Button href={`/admin/requests/${request.id}/quote/new`} className="py-1 h-9">
               <PlusCircle className="size-4" />
@@ -173,9 +172,7 @@ export default async function AdminRequestDetailsPage({
                         <FileSignature className="size-4 text-muted-foreground" />
                         <h3 className="font-medium text-foreground">Quote {activeQuote.referenceNumber}</h3>
                       </div>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                        {activeQuote.status}
-                      </span>
+                      <StatusBadge status={activeQuote.status} size="sm" />
                     </div>
                     <div className="text-lg font-display font-medium text-foreground mb-3">
                       {activeQuote.currency || 'NGN'} {activeQuote.total.toString()}
@@ -192,9 +189,7 @@ export default async function AdminRequestDetailsPage({
                         <ReceiptText className="size-4 text-muted-foreground" />
                         <h3 className="font-medium text-foreground">Order {activeOrder.orderNumber}</h3>
                       </div>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info border border-info/20">
-                        {activeOrder.status}
-                      </span>
+                      <StatusBadge status={activeOrder.status} size="sm" />
                     </div>
                     <div className="text-lg font-display font-medium text-foreground mb-3">
                       {activeOrder.currency || 'NGN'} {activeOrder.total.toString()}

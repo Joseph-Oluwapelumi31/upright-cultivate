@@ -5,6 +5,7 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { requireAdmin } from "@/lib/auth/authorization";
 import { z } from "zod";
 import crypto from "crypto";
+import { revalidatePath } from "next/cache";
 
 const createInvoiceSchema = z.object({
   orderId: z.string().min(1, "Order ID is required."),
@@ -98,6 +99,10 @@ export async function createInvoice(orderId: string): Promise<ActionState> {
       });
     });
 
+    revalidatePath("/admin/invoices");
+    revalidatePath(`/admin/orders/${orderId}`);
+    revalidatePath("/dashboard/invoices");
+
     return {
       success: true,
       message: "Invoice created successfully.",
@@ -185,6 +190,10 @@ export async function issueInvoice(invoiceId: string, dueDate: string): Promise<
       }
       return { success: false, message: "Invoice could not be issued. It may have already been issued by another administrator." };
     }
+
+    revalidatePath("/admin/invoices");
+    revalidatePath(`/admin/invoices/${result.data.invoiceId}`);
+    revalidatePath("/dashboard/invoices");
 
     return {
       success: true,

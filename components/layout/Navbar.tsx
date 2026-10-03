@@ -56,7 +56,7 @@ export default function Navbar({ user }: { user?: any }) {
 
   return (
     <header
-      className={`fixed left-0 top-0 z-50 w-full bg-transparent h-20 py-7 transition-transform duration-300 ${
+      className={`hidden lg:block fixed left-0 top-0 z-50 w-full bg-transparent h-20 py-7 transition-transform duration-300 ${
         showNavbar ? "translate-y-0" : "-translate-y-full"
       }`}
     >
@@ -108,91 +108,10 @@ export default function Navbar({ user }: { user?: any }) {
               <UserMenu user={user} />
             ) : (
               <Button href="/supply" variant="primary">
-                <p className="text-primary-foreground">Request supply plan</p>
+                Request supply plan
               </Button>
             )}
           </div>
-
-          {/* Mobile menu toggle */}
-          <div className="lg:hidden flex items-center gap-2 rounded-full bg-surface/90 p-2 shadow-sm">
-            <button
-              type="button"
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-transparent text-primary transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-expanded={menuOpen}
-              aria-controls="mobile-menu"
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-            >
-              <div className="relative h-5 w-6">
-                <span
-                  className={`absolute left-0 top-0 h-0.5 w-full bg-current transition-all duration-300 ${
-                    menuOpen ? "translate-y-2 rotate-45" : ""
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 top-2 h-0.5 w-full bg-current transition-opacity duration-300 ${
-                    menuOpen ? "opacity-0" : "opacity-100"
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 top-4 h-0.5 w-full bg-current transition-all duration-300 ${
-                    menuOpen ? "-translate-y-2 -rotate-45" : ""
-                  }`}
-                />
-              </div>
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile menu drawer */}
-        <div
-          id="mobile-menu"
-          className={`fixed inset-x-0 top-24 mx-4 overflow-hidden rounded-3xl bg-surface shadow-lg transition-all duration-300 lg:hidden ${
-            menuOpen
-              ? "visible translate-y-0 opacity-100"
-              : "invisible -translate-y-4 opacity-0"
-          }`}
-        >
-          <nav className="flex flex-col p-6" aria-label="Mobile navigation">
-            <div className="flex flex-col space-y-4 pb-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-2xl font-medium tracking-tight text-primary transition-colors hover:text-primary/70"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              {!user && (
-                <Link
-                  href="/signin"
-                  className="text-2xl font-medium tracking-tight text-primary transition-colors hover:text-primary/70"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Sign in
-                </Link>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-4 border-t border-border pt-6">
-              {user ? (
-                <div className="flex justify-center">
-                  <UserMenu user={user} />
-                </div>
-              ) : (
-                <Button
-                  href="/supply"
-                  variant="primary"
-                  className="w-full text-center justify-center text-lg h-14"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Request supply plan
-                </Button>
-              )}
-            </div>
-          </nav>
         </div>
       </Container>
     </header>

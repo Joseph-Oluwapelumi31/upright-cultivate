@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { FileText, FileSignature, Package, FileClock } from "lucide-react";
+import { FileText, FileSignature, Package, FileClock } from "lucide-react";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function DashboardOverviewPage() {
   const user = await requireCustomer();
@@ -50,7 +51,7 @@ export default async function DashboardOverviewPage() {
         </div>
         <div className="shrink-0 mt-4 md:mt-0">
           <Button href="/supply" variant="primary">
-            Create Supply Plan
+            <p className="text-primary-foreground">Create Supply Plan</p>
           </Button>
         </div>
       </div>
@@ -128,7 +129,7 @@ export default async function DashboardOverviewPage() {
           <p className="text-sm text-muted-foreground mb-4">
             Active recurring supply plans
           </p>
-          <Link href="/dashboard/plans" className="text-sm font-medium text-primary hover:underline mt-auto">
+          <Link href="/dashboard/requests" className="text-sm font-medium text-primary hover:underline mt-auto">
             Manage plans &rarr;
           </Link>
         </Card>
@@ -162,9 +163,7 @@ export default async function DashboardOverviewPage() {
                     <td className="p-4 font-medium text-foreground">{item.ref}</td>
                     <td className="p-4 text-muted-foreground capitalize">{item.type}</td>
                     <td className="p-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                        {item.status}
-                      </span>
+                      <StatusBadge status={item.status} />
                     </td>
                     <td className="p-4 text-muted-foreground">
                       {item.date.toLocaleDateString()}

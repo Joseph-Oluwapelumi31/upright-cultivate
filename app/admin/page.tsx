@@ -4,6 +4,7 @@ import Link from "next/link";
 import Button from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Users, FileText, FileSignature, Package, AlertCircle } from "lucide-react";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function AdminOverviewPage() {
   const user = await requireAdmin();
@@ -85,9 +86,7 @@ export default async function AdminOverviewPage() {
                     </Link>
                     <p className="text-sm text-muted-foreground">{req.business.name}</p>
                   </div>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                    {req.status}
-                  </span>
+                  <StatusBadge status={req.status} />
                 </Card>
               ))}
             </div>
@@ -113,9 +112,7 @@ export default async function AdminOverviewPage() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium text-foreground">{order.currency} {order.total.toString()}</p>
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-info/10 text-info border border-info/20 mt-1">
-                      {order.status}
-                    </span>
+                    <StatusBadge status={order.status} className="mt-1" />
                   </div>
                 </Card>
               ))}

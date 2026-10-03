@@ -9,6 +9,11 @@ export async function sendVerificationEmail({
   name: string;
   otp: string;
 }) {
+  if (email.endsWith('@example.com') || process.env.NODE_ENV === 'test') {
+    console.log(`[TEST] Skipping email for ${email}. OTP is ${otp}`);
+    return { id: 'test-email-id' };
+  }
+
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <h2>Welcome to Upright Cultivate</h2>

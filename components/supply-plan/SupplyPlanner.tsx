@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo, useState, useEffect, useActionState } from "react";
 import Image from "next/image";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
@@ -15,9 +14,10 @@ import {
   Search,
 } from "lucide-react";
 import { useSupplyPlan } from "@/components/supply-plan/SupplyPlanProvider";
+import { submitSupplyRequest } from "@/actions/supply-request";
+import Link from "next/link";
 
-
-type PlannerStep = "plan" | "review" | "request" | "received";
+type PlannerStep = "plan" | "review" | "received";
 
 const MAX_QUANTITY = 500;
 
@@ -71,13 +71,14 @@ function formatVolume(value: number, unit = "kg") {
 }
 
 export default function SupplyPlanner({ 
-  isAuthenticated = false,
-  initialGroups = []
+  initialGroups = [],
+  business,
+  location
 }: { 
-  isAuthenticated?: boolean;
   initialGroups?: { title: string; items: { id: string; name: string }[] }[];
+  business?: { id: string; name: string; type?: string; } | null;
+  location?: { id: string; name: string; } | null;
 }) {
-  const router = useRouter();
   const {
     items,
     addItem,
@@ -88,22 +89,38 @@ export default function SupplyPlanner({
 
   const [step, setStep] = useState<PlannerStep>("plan");
   const [frequency, setFrequency] = useState("Weekly");
-  const [businessType, setBusinessType] = useState("Restaurant");
   const [productQuery, setProductQuery] = useState("");
   const [activeGroup, setActiveGroup] = useState(
     initialGroups[0]?.title ?? "",
   );
   const [plannerError, setPlannerError] = useState("");
+  const businessType = business?.type || "Business";
+
+  const [state, formAction, isPending] = useActionState(
+    submitSupplyRequest,
+    { success: false, message: "" }
+  );
+
+  const [submissionKey, setSubmissionKey] = useState("");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSubmissionKey(crypto.randomUUID());
     const savedFrequency = window.localStorage.getItem("upright-supply-frequency");
-    // eslint-disable-next-line
     if (savedFrequency) setFrequency(savedFrequency);
   }, []);
 
   useEffect(() => {
     window.localStorage.setItem("upright-supply-frequency", frequency);
   }, [frequency]);
+
+  useEffect(() => {
+    if (state.success) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setStep("received");
+      clearPlan();
+    }
+  }, [state.success, clearPlan]);
 
   const selectedIds = useMemo(
     () => new Set(items.map((item) => item.id)),
@@ -229,28 +246,11 @@ export default function SupplyPlanner({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleRequest = () => {
-    if (!items.length) {
-      setStep("plan");
-      return;
-    }
-
-    if (!isAuthenticated) {
-      router.push("/signin?next=/supply/checkout");
-      return;
-    }
-
-    router.push("/supply/checkout");
-  };
-
-
-
   const handleStartNewPlan = () => {
-    clearPlan();
     setFrequency("Weekly");
-    setBusinessType("Restaurant");
     setProductQuery("");
     setPlannerError("");
+    setSubmissionKey(crypto.randomUUID());
     setStep("plan");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -798,20 +798,26 @@ export default function SupplyPlanner({
                   <div className="mt-8 grid gap-4 sm:grid-cols-2">
                     <div className="rounded-xl border border-primary/10 bg-background p-4">
                       <p className="text-xs text-foreground/40">
-                        Delivery frequency
+                        Business
                       </p>
                       <p className="mt-1.5 text-sm font-semibold">
-                        {frequency}
+                        {business?.name || "None"}
                       </p>
+                      <div className="mt-2">
+                        <Link href="/supply" className="text-xs text-primary hover:underline">Change</Link>
+                      </div>
                     </div>
 
                     <div className="rounded-xl border border-primary/10 bg-background p-4">
                       <p className="text-xs text-foreground/40">
-                        Business type
+                        Location
                       </p>
                       <p className="mt-1.5 text-sm font-semibold">
-                        {businessType}
+                        {location?.name || "None"}
                       </p>
+                      <div className="mt-2">
+                        <Link href="/supply" className="text-xs text-primary hover:underline">Change</Link>
+                      </div>
                     </div>
                   </div>
 
@@ -835,25 +841,49 @@ export default function SupplyPlanner({
                     </div>
                   </div>
 
-                  <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <button
-                      type="button"
-                      onClick={handleReviewBack}
-                      className="flex items-center justify-center gap-2 text-sm font-semibold text-foreground/55 transition hover:text-foreground"
-                    >
-                      <ArrowLeft size={16} />
-                      Back to plan
-                    </button>
+                  <form action={formAction}>
+                    <input type="hidden" name="submissionKey" value={submissionKey} />
+                    <input type="hidden" name="businessId" value={business?.id ?? ""} />
+                    <input type="hidden" name="locationId" value={location?.id ?? ""} />
+                    <input type="hidden" name="frequency" value={frequency} />
+                    <input type="hidden" name="isRecurring" value="false" />
+                    <input
+                      type="hidden"
+                      name="items"
+                      value={JSON.stringify(
+                        items.map(item => ({
+                          productSlug: item.id,
+                          quantity: item.quantity,
+                        }))
+                      )}
+                    />
 
-                    <Button
-                      type="button"
-                      onClick={handleRequest}
-                      className="w-full sm:w-auto"
-                    >
-                      Continue to your details
-                      <ArrowRight size={17} />
-                    </Button>
-                  </div>
+                    {!state.success && state.message && (
+                      <p className="mb-5 text-sm text-red-600" role="alert" aria-live="polite">
+                        {state.message}
+                      </p>
+                    )}
+
+                    <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <button
+                        type="button"
+                        onClick={handleReviewBack}
+                        className="flex items-center justify-center gap-2 text-sm font-semibold text-foreground/55 transition hover:text-foreground"
+                      >
+                        <ArrowLeft size={16} />
+                        Back to plan
+                      </button>
+
+                      <Button
+                        type="submit"
+                        disabled={isPending || !items.length || !business?.id || !location?.id}
+                        className="w-full sm:w-auto"
+                      >
+                        {isPending ? "Sending request..." : "Submit Supply Request"}
+                        {!isPending && <ArrowRight size={17} />}
+                      </Button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>

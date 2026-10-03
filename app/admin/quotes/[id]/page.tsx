@@ -6,6 +6,7 @@ import { ArrowLeft, Store, MapPin, Package, User, Pencil, Send } from "lucide-re
 import Button from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import AdminSendQuoteButton from "@/components/admin/AdminSendQuoteButton";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function AdminQuoteDetailsPage({
   params,
@@ -42,20 +43,18 @@ export default async function AdminQuoteDetailsPage({
           </h1>
           <div className="text-body text-muted-foreground space-x-2">
             <span>Created on {new Date(quote.createdAt).toLocaleDateString()}</span>
-            <span>•</span>
+            <span>â€¢</span>
             <span>Last updated {new Date(quote.updatedAt).toLocaleDateString()}</span>
             {quote.validUntil && (
               <>
-                <span>•</span>
+                <span>â€¢</span>
                 <span>Valid until {new Date(quote.validUntil).toLocaleDateString()}</span>
               </>
             )}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-secondary/10 text-secondary border border-secondary/20">
-            {quote.status}
-          </span>
+          <StatusBadge status={quote.status} size="xl" />
           {isDraft && (
             <>
               <Button href={`/admin/quotes/${quote.id}/edit`} variant="secondary" className="py-1 h-9">
@@ -97,9 +96,7 @@ export default async function AdminQuoteDetailsPage({
                   <Link href={`/admin/requests/${request.id}`} className="text-primary hover:underline font-medium">
                     {request.referenceNumber}
                   </Link>
-                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary/10 text-secondary border border-secondary/20 uppercase tracking-wider">
-                    {request.status}
-                  </span>
+                  <StatusBadge status={request.status} size="xs" className="ml-2" />
                 </div>
               </div>
             </Card>

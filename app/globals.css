@@ -160,6 +160,16 @@
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
 
+  /* Semantic states */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
   /* Palette mapping (for explicit utility generation, e.g., bg-wheat-cream) */
   --color-wheat-cream: var(--color-wheat-cream);
   --color-harvest-copper: var(--color-harvest-copper);
@@ -282,8 +292,13 @@ button {
   cursor: pointer;
 }
 
-a {
-  color: inherit;
+/* Must live in @layer base: unlayered rules beat every layered rule
+   (including Tailwind utilities like text-primary-foreground) regardless
+   of specificity. */
+@layer base {
+  a {
+    color: inherit;
+  }
 }
 
 ::selection {

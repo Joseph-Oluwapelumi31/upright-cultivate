@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Store, MapPin, FileSignature } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import OrderStatusTimeline from "@/components/dashboard/order/OrderStatusTimeline";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 const formatCurrency = (amount: number | string, currency = "NGN") => {
   return new Intl.NumberFormat('en-NG', { style: 'currency', currency }).format(Number(amount));
@@ -39,9 +40,7 @@ export default async function DashboardOrderDetailsPage({
               <h1 className="text-3xl font-display font-medium text-foreground">
                 {order.orderNumber}
               </h1>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-secondary/10 text-secondary border border-secondary/20">
-                {order.status}
-              </span>
+              <StatusBadge status={order.status} size="lg" />
             </div>
             <p className="text-muted-foreground text-sm flex items-center gap-2">
               Placed {new Date(order.createdAt).toLocaleDateString()}

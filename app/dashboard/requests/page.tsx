@@ -6,7 +6,8 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Search } from "lucide-react";
-import { RequestStatus } from "@/lib/generated/prisma/client";
+import { RequestStatus } from "@/lib/generated/prisma/client";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function DashboardRequestsPage({
   searchParams,
@@ -104,9 +105,7 @@ export default async function DashboardRequestsPage({
                     <td className="p-4 text-muted-foreground">{req.business.name}</td>
                     <td className="p-4 text-muted-foreground">{req.location.name}</td>
                     <td className="p-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                        {req.status}
-                      </span>
+                      <StatusBadge status={req.status} />
                     </td>
                     <td className="p-4 text-muted-foreground whitespace-nowrap">
                       {new Date(req.createdAt).toLocaleDateString()}
@@ -130,9 +129,7 @@ export default async function DashboardRequestsPage({
                     <div className="font-medium text-foreground">{req.referenceNumber}</div>
                     <div className="text-sm text-muted-foreground">{new Date(req.createdAt).toLocaleDateString()}</div>
                   </div>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                    {req.status}
-                  </span>
+                  <StatusBadge status={req.status} />
                 </div>
                 <div className="text-sm">
                   <div className="text-foreground">{req.business.name}</div>

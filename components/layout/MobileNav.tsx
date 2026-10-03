@@ -292,7 +292,7 @@ export default function MobileNav({ user }: { user?: any }) {
                         className="mt-2 w-full"
                         onClick={closeMenu}
                       >
-                        <p className="text-primary-foreground">Request supply plan</p>
+                        Request supply plan
                       </Button>
                     </>
                   )}

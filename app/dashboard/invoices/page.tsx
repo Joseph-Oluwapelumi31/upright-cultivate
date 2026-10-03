@@ -8,6 +8,7 @@ const formatCurrency = (amount: number | string, currency = "NGN") => {
 };
 
 import { getInvoiceDisplayStatus, formatInvoiceStatus } from "@/lib/invoice-utils";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function DashboardInvoicesPage() {
   const invoices = await getCustomerInvoices();
@@ -49,12 +50,10 @@ export default async function DashboardInvoicesPage() {
                     <td className="p-4 text-muted-foreground">{invoice.business.name}</td>
                     <td className="p-4 font-medium">{formatCurrency(invoice.total.toString(), invoice.currency)}</td>
                     <td className="p-4 text-muted-foreground whitespace-nowrap">
-                      {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-US', { timeZone: 'UTC' }) : "—"}
+                      {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-US', { timeZone: 'UTC' }) : "â€”"}
                     </td>
                     <td className="p-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                        {formatInvoiceStatus(getInvoiceDisplayStatus(invoice.status, invoice.dueDate))}
-                      </span>
+                      <StatusBadge status={getInvoiceDisplayStatus(invoice.status, invoice.dueDate)}>{formatInvoiceStatus(getInvoiceDisplayStatus(invoice.status, invoice.dueDate))}</StatusBadge>
                     </td>
                     <td className="p-4 text-right">
                       <Link href={`/dashboard/invoices/${invoice.id}`} className="text-primary hover:underline font-medium inline-flex items-center gap-1">
@@ -75,14 +74,12 @@ export default async function DashboardInvoicesPage() {
                     <div className="font-medium text-foreground">{invoice.invoiceNumber || <span className="text-muted-foreground font-normal italic">Not issued</span>}</div>
                     <div className="text-sm text-muted-foreground">{formatCurrency(invoice.total.toString(), invoice.currency)}</div>
                   </div>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                    {formatInvoiceStatus(getInvoiceDisplayStatus(invoice.status, invoice.dueDate))}
-                  </span>
+                  <StatusBadge status={getInvoiceDisplayStatus(invoice.status, invoice.dueDate)}>{formatInvoiceStatus(getInvoiceDisplayStatus(invoice.status, invoice.dueDate))}</StatusBadge>
                 </div>
                 <div className="text-sm flex flex-col gap-1">
                   <div className="text-foreground">{invoice.business.name}</div>
                   <div className="text-muted-foreground">Order: {invoice.order.orderNumber}</div>
-                  <div className="text-muted-foreground mt-1">Due: {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-US', { timeZone: 'UTC' }) : "—"}</div>
+                  <div className="text-muted-foreground mt-1">Due: {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-US', { timeZone: 'UTC' }) : "â€”"}</div>
                 </div>
                 <div className="pt-2 border-t border-border flex justify-end">
                   <Link href={`/dashboard/invoices/${invoice.id}`} className="text-sm text-primary hover:underline font-medium inline-flex items-center gap-1">

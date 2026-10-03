@@ -130,13 +130,26 @@ export async function updateBusinessAction(
   };
 }
 
-export async function getBusinessesAction() {
+export async function getBusinessesAction(options?: { includeInactive?: boolean }) {
   const user = await requireCustomer();
   
   const businesses = await prisma.business.findMany({
     where: {
       userId: user.id,
-      isActive: true,
+      ...(options?.includeInactive ? {} : { isActive: true }),
+    },
+    include: {
+      _count: {
+        select: {
+          supplyRequests: true,
+          quotes: true,
+          orders: true,
+          invoices: true,
+        },
+      },
+      locations: {
+        select: { id: true, name: true },
+      },
     },
     orderBy: {
       createdAt: 'asc',
@@ -145,7 +158,91 @@ export async function getBusinessesAction() {
   
   return {
     success: true,
-    businesses,
+    businesses: businesses.map(b => ({
+      ...b,
+      hasHistory: b._count.supplyRequests > 0 || b._count.quotes > 0 || b._count.orders > 0 || b._count.invoices > 0,
+    })),
   };
+}
+
+export async function deactivateBusinessAction(businessId: string) {
+  const user = await requireCustomer();
+  
+  const isOwner = await ownsBusiness(user.id, businessId);
+  if (!isOwner) {
+    throw new Error("FORBIDDEN");
+  }
+
+  // Soft delete by setting isActive to false
+  await prisma.business.update({
+    where: { id: businessId },
+    data: { isActive: false },
+  });
+
+  return { success: true };
+}
+
+export async function reactivateBusinessAction(businessId: string) {
+  const user = await requireCustomer();
+  
+  const isOwner = await ownsBusiness(user.id, businessId);
+  if (!isOwner) {
+    throw new Error("FORBIDDEN");
+  }
+
+  await prisma.business.update({
+    where: { id: businessId },
+    data: { isActive: true },
+  });
+
+  return { success: true };
+}
+
+export async function deleteBusinessAction(businessId: string) {
+  const user = await requireCustomer();
+  
+  const isOwner = await ownsBusiness(user.id, businessId);
+  if (!isOwner) {
+    throw new Error("FORBIDDEN");
+  }
+
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    include: {
+      _count: {
+        select: {
+          supplyRequests: true,
+          quotes: true,
+          orders: true,
+          invoices: true,
+        }
+      }
+    }
+  });
+
+  if (!business) {
+    throw new Error("BUSINESS_NOT_FOUND");
+  }
+
+  const hasHistory = 
+    business._count.supplyRequests > 0 ||
+    business._count.quotes > 0 ||
+    business._count.orders > 0 ||
+    business._count.invoices > 0;
+
+  if (hasHistory) {
+    return { success: false, error: "HAS_HISTORY" };
+  }
+
+  try {
+    // Attempt hard delete. Will throw if there are restrictive relations (like locations)
+    await prisma.business.delete({ where: { id: businessId } });
+    return { success: true };
+  } catch (err: any) {
+    if (err.code === "P2003") {
+      return { success: false, error: "HAS_LOCATIONS" };
+    }
+    throw err;
+  }
 }
 

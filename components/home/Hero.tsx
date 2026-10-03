@@ -9,7 +9,6 @@ export default function Hero() {
       aria-labelledby="hero-heading"
       className="relative min-h-screen overflow-hidden"
     >
-      Background video
       <div aria-hidden="true" className="absolute inset-0">
         <video
           autoPlay
@@ -24,7 +23,7 @@ export default function Hero() {
         </video>
       </div>
 
-      Atmospheric overlay
+      {/* Atmospheric overlay */}
       <div
         aria-hidden="true"
         className="
@@ -75,19 +74,18 @@ export default function Hero() {
               {/* Actions */}
               <div className="mt-9 flex flex-wrap items-center gap-3">
                 {/* Primary CTA */}
-                <Button 
+                <Button
                   href="/supply"
                   variant="accent"
                 >
-                  <p className="text-accent-foreground">Request a supply plan</p>
-
+                  Request a supply plan
                 </Button>
 
                 {/* Secondary CTA */}
-                <Button href="/#products" variant="secondary">
-                  <p className="text-secondary-foreground">Explore produce</p>
+                <Button href="/#products" variant="secondary" className="bg-blue">
+                  Explore produce
                 </Button>
-                
+
               </div>
 
             </div>

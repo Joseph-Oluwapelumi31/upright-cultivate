@@ -7,6 +7,7 @@ import OrderStatusTimeline from "@/components/dashboard/order/OrderStatusTimelin
 import Button from "@/components/ui/Button";
 import AdminOrderStatusControls from "@/components/admin/order/AdminOrderStatusControls";
 import AdminInvoiceControls from "@/components/admin/order/AdminInvoiceControls";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 const formatCurrency = (amount: number | string, currency = "NGN") => {
   return new Intl.NumberFormat('en-NG', { style: 'currency', currency }).format(Number(amount));
@@ -42,9 +43,7 @@ export default async function AdminOrderDetailsPage({
               <h1 className="text-3xl font-bold font-display text-foreground">
                 Order {order.orderNumber}
               </h1>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-secondary/10 text-secondary border border-secondary/20 uppercase tracking-wider">
-                {order.status}
-              </span>
+              <StatusBadge status={order.status} size="lg" className="uppercase tracking-wider" />
             </div>
             <p className="text-body text-muted-foreground">
               Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}

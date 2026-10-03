@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Search } from "lucide-react";
 import { OrderStatus } from "@/lib/generated/prisma/client";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 const formatCurrency = (amount: number | string, currency = "NGN") => {
   return new Intl.NumberFormat('en-NG', { style: 'currency', currency }).format(Number(amount));
@@ -124,9 +125,7 @@ export default async function AdminOrdersPage({
                       <td className="p-4 text-foreground">{order.location.name}</td>
                       <td className="p-4 font-medium">{formatCurrency(order.total.toString(), order.currency)}</td>
                       <td className="p-4">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                          {order.status}
-                        </span>
+                        <StatusBadge status={order.status} />
                       </td>
                       <td className="p-4 text-right">
                         <Link href={`/admin/orders/${order.id}`} className="text-primary hover:underline font-medium">
@@ -151,9 +150,7 @@ export default async function AdminOrdersPage({
                     </span>
                     <span className="font-medium text-foreground text-lg">{order.orderNumber}</span>
                   </div>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                    {order.status}
-                  </span>
+                  <StatusBadge status={order.status} />
                 </div>
                 <div>
                   <span className="text-foreground font-medium block">{formatCurrency(order.total.toString(), order.currency)}</span>

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Search } from "lucide-react";
 import { RequestStatus } from "@/lib/generated/prisma/client";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function AdminRequestsPage({
   searchParams,
@@ -116,9 +117,7 @@ export default async function AdminRequestsPage({
                       <td className="p-4 text-foreground">{request.user.name}</td>
                       <td className="p-4 text-foreground">{request.business.name}</td>
                       <td className="p-4">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                          {request.status}
-                        </span>
+                        <StatusBadge status={request.status} />
                       </td>
                       <td className="p-4 text-right">
                         <Link href={`/admin/requests/${request.id}`} className="text-primary hover:underline font-medium">
@@ -143,9 +142,7 @@ export default async function AdminRequestsPage({
                     </span>
                     <span className="font-medium text-foreground text-lg">{request.referenceNumber}</span>
                   </div>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                    {request.status}
-                  </span>
+                  <StatusBadge status={request.status} />
                 </div>
                 <div>
                   <span className="text-foreground">{request.business.name}</span>

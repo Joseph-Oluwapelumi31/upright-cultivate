@@ -13,6 +13,7 @@ interface CommonButtonProps {
   disabled?: boolean;
   isLoading?: boolean;
   className?: string;
+  title?: string;
 }
 
 interface NativeButtonProps extends CommonButtonProps {
@@ -45,6 +46,8 @@ const variants: Record<ButtonVariant, string> = {
   accent:
     "bg-accent text-accent-foreground hover:-translate-y-0.5 hover:bg-accent/90 focus-visible:ring-accent",
 
+
+
   /**
    * Secondary action
    */
@@ -65,6 +68,7 @@ export default function Button(props: ButtonProps) {
     disabled = false,
     isLoading = false,
     className = "",
+    title,
   } = props;
 
   const styles = `${baseStyles} ${variants[variant]} ${className}`;
@@ -91,6 +95,7 @@ export default function Button(props: ButtonProps) {
         <span
           className={styles}
           aria-disabled="true"
+          title={title}
         >
           {content}
         </span>
@@ -102,6 +107,7 @@ export default function Button(props: ButtonProps) {
         href={props.href}
         className={styles}
         onClick={props.onClick}
+        title={title}
       >
         {content}
       </Link>
@@ -118,6 +124,7 @@ export default function Button(props: ButtonProps) {
       className={styles}
       onClick={props.onClick}
       aria-busy={isLoading || undefined}
+      title={title}
     >
       {content}
     </button>
